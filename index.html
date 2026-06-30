@@ -159,6 +159,20 @@
   a { color: var(--accent); }
 
   /* ---- Infographic ---- */
+  .modules { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 16px; }
+  @media (min-width: 820px) { .modules { grid-template-columns: 1fr 1fr; } }
+  .mod { border: 1px solid var(--border); border-radius: 12px; background: #0d1530; padding: 14px 16px; }
+  .mod .head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+  .mod .name { font-family: var(--mono); font-weight: 700; color: #e8ecf8; }
+  .mod .role { font-size: 11px; font-family: var(--mono); padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); }
+  .mod .role.bad  { color: var(--red);    border-color: #6b2b2b; }
+  .mod .role.good { color: var(--green);  border-color: #2c6d4f; }
+  .mod .role.io   { color: var(--accent); border-color: #2a3a6b; }
+  .mod p { margin: 0; color: #cdd5ee; font-size: 14px; }
+  .svgfig { margin-top: 14px; border: 1px solid var(--border); border-radius: 14px; background: #0d1530; padding: 10px; }
+  .svgfig img { display: block; width: 100%; height: auto; border-radius: 8px; }
+
+  /* ---- Infographic ---- */
   .figure {
     margin-top: 8px; border: 1px solid var(--border); border-radius: 16px;
     background: #0d1530; padding: 14px; overflow: hidden;
@@ -320,6 +334,55 @@
         full visibility.
       </div>
     </div>
+  </section>
+
+  <!-- ARCHITECTURE (UML) -->
+  <section>
+    <h2>🧰 Architecture — how <code>src/</code> fits together</h2>
+    <p class="lede" style="margin-bottom:8px">
+      Six modules form a clean, acyclic chain: <strong>domain model → parser → subagent
+      (one contract, two implementations) → coordinator → entry</strong>.
+    </p>
+
+    <figure class="svgfig">
+      <img src="docs/uml-class.svg"
+           alt="UML class diagram of the src modules and their relationships"
+           loading="lazy" />
+    </figure>
+
+    <div class="modules">
+      <div class="mod">
+        <div class="head"><span class="name">document.js</span><span class="role">domain model</span></div>
+        <p><code>PdfSection</code> + <code>PdfDocument</code> and the <code>sampleCorpus()</code> factory. Pure data — including the failure flags (<code>corrupted</code>, <code>protected</code>, <code>large</code>). No behaviour.</p>
+      </div>
+      <div class="mod">
+        <div class="head"><span class="name">pdf-parser.js</span><span class="role io">simulated I/O</span></div>
+        <p>A stand-in PDF library. Its key design choice: it throws <strong>typed errors tagged with <code>recoverable</code></strong> — that flag is the seam a smart caller branches on.</p>
+      </div>
+      <div class="mod">
+        <div class="head"><span class="name">subagent-naive.js</span><span class="role bad">❌ anti-pattern</span></div>
+        <p>Calls the parser once with <strong>zero</strong> error handling. Any exception terminates it and bubbles up with no partials and no context — the exact problem the question describes.</p>
+      </div>
+      <div class="mod">
+        <div class="head"><span class="name">subagent-resilient.js</span><span class="role good">✅ the answer</span></div>
+        <p>Implements <strong>local recovery</strong>: skip+degrade on corrupted sections, bounded retry on timeouts, and escalates only the unresolvable password case — as a structured <code>Result</code>, not a bare throw.</p>
+      </div>
+      <div class="mod">
+        <div class="head"><span class="name">coordinator.js</span><span class="role">orchestrator</span></div>
+        <p>Iterates the corpus and delegates each document to a subagent. Only reacts to <code>status === "failed"</code>; everything else is aggregated. Swappable subagents via the shared <code>process()</code> contract.</p>
+      </div>
+      <div class="mod">
+        <div class="head"><span class="name">sleep.js</span><span class="role">utility</span></div>
+        <p>A one-liner <code>sleep(ms)</code> helper used to simulate parsing latency and timeouts.</p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:28px">Runtime workflow (sequence)</h3>
+    <figure class="svgfig">
+      <img src="docs/uml-workflow.svg"
+           alt="UML sequence diagram of the resilient research-task workflow"
+           loading="lazy" />
+    </figure>
   </section>
 
   <!-- FLOW -->

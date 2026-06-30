@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 1200" width="1240" height="1200" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
+  <defs>
+    <marker id="inherit" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="12" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L11,6 L0,12 z" fill="#0e1733" stroke="#93a0c4" stroke-width="1.2"/>
+    </marker>
+    <marker id="agg" viewBox="0 0 16 10" refX="15" refY="5" markerWidth="16" markerHeight="10" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,5 L8,0 L16,5 L8,10 z" fill="#0e1733" stroke="#93a0c4" stroke-width="1.2"/>
+    </marker>
+    <marker id="open" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="12" markerHeight="12" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L11,6 L0,12" fill="none" stroke="#93a0c4" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+    </marker>
+  </defs>
+
+  <!-- card background -->
+  <rect x="0" y="0" width="1240" height="1200" fill="#0b1020"/>
+  <rect x="14" y="14" width="1212" height="1172" rx="16" fill="#0e1733" stroke="#283358" stroke-width="1"/>
+
+  <!-- title -->
+  <text x="40" y="56" font-size="26" font-weight="700" fill="#e8ecf8">Class diagram — src/</text>
+  <text x="40" y="82" font-size="14" fill="#93a0c4">Domain model → parser (typed errors) → subagents (one contract, two impls) → coordinator → entry</text>
+
+  <!-- legend -->
+  <g font-size="12" fill="#93a0c4">
+    <text x="820" y="52">Legend:</text>
+    <line x1="880" y1="48" x2="930" y2="48" stroke="#93a0c4" stroke-width="1.4" marker-end="url(#open)"/>
+    <text x="938" y="52">dependency</text>
+    <line x1="1030" y1="48" x2="1075" y2="48" stroke="#93a0c4" stroke-width="1.4" marker-end="url(#inherit)"/>
+    <text x="1085" y="52">inherits</text>
+    <line x1="880" y1="72" x2="930" y2="72" stroke="#93a0c4" stroke-width="1.4" marker-end="url(#agg)"/>
+    <text x="938" y="76">aggregation</text>
+    <line x1="1030" y1="72" x2="1075" y2="72" stroke="#93a0c4" stroke-width="1.4" stroke-dasharray="6 5" marker-end="url(#open)"/>
+    <text x="1085" y="76">«creates»</text>
+  </g>
+
+  <!-- ============ DOMAIN ROW ============ -->
+  <!-- PdfSection -->
+  <g>
+    <rect x="70" y="120" width="230" height="168" rx="8" fill="#131a2e" stroke="#283358"/>
+    <rect x="70" y="120" width="230" height="36" rx="8" fill="#1a2240"/>
+    <rect x="70" y="148" width="230" height="8" fill="#1a2240"/>
+    <text x="185" y="144" font-size="16" font-weight="700" fill="#e8ecf8" text-anchor="middle">PdfSection</text>
+    <text x="86" y="182" font-size="13" fill="#cdd5ee">+ id: string</text>
+    <text x="86" y="204" font-size="13" fill="#cdd5ee">+ text: string</text>
+    <text x="86" y="226" font-size="13" fill="#cdd5ee">+ corrupted: boolean</text>
+  </g>
+
+  <!-- PdfDocument -->
+  <g>
+    <rect x="410" y="108" width="270" height="192" rx="8" fill="#131a2e" stroke="#283358"/>
+    <rect x="410" y="108" width="270" height="36" rx="8" fill="#1a2240"/>
+    <rect x="410" y="136" width="270" height="8" fill="#1a2240"/>
+    <text x="545" y="132" font-size="16" font-weight="700" fill="#e8ecf8" text-anchor="middle">PdfDocument</text>
+    <text x="426" y="170" font-size="13" fill="#cdd5ee">+ id: string</text>
+    <text x="426" y="192" font-size="13" fill="#cdd5ee">+ title: string</text>
+    <text x="426" y="214" font-size="13" fill="#cdd5ee">+ sections: PdfSection[]</text>
+    <text x="426" y="236" font-size="13" fill="#cdd5ee">+ protected: boolean</text>
+    <text x="426" y="258" font-size="13" fill="#cdd5ee">+ large: boolean</text>
+  </g>
+
+  <!-- sampleCorpus factory note -->
+  <g>
+    <rect x="770" y="128" width="250" height="104" rx="8" fill="#0d1a33" stroke="#6ea8ff" stroke-dasharray="6 5"/>
+    <text x="895" y="160" font-size="12" font-style="italic" fill="#6ea8ff" text-anchor="middle">«factory»</text>
+    <text x="895" y="184" font-size="15" font-weight="700" fill="#e8ecf8" text-anchor="middle">sampleCorpus()</text>
+    <text x="895" y="210" font-size="13" fill="#93a0c4" text-anchor="middle">returns PdfDocument[]</text>
+  </g>
+
+  <!-- PdfSection ◇—— PdfDocument aggregation -->
+  <line x1="300" y1="200" x2="410" y2="200" stroke="#93a0c4" stroke-width="1.4" marker-end="url(#agg)"/>
+  <text x="316" y="194" font-size="12" fill="#93a0c4">1..*</text>
+  <text x="392" y="194" font-size="12" fill="#93a0c4">1</text>
+  <text x="338" y="220" font-size="12" fill="#93a0c4">sections</text>
+
+  <!-- sampleCorpus creates PdfDocument -->
+  <line x1="770" y1="180" x2="682" y2="180" stroke="#6ea8ff" stroke-width="1.4" stroke-dasharray="6 5" marker-end="url(#open)"/>
+  <text x="690" y="172" font-size="12" font-style="italic" fill="#6ea8ff">«creates»</text>
+
+  <!-- ============ PARSER ROW ============ -->
+  <!-- PdfParser -->
+  <g>
+    <rect x="410" y="370" width="270" height="140" rx="8" fill="#131a2e" stroke="#283358"/>
+    <rect x="410" y="370" width="270" height="46" rx="8" fill="#1a2240"/>
+    <rect x="410" y="408" width="270" height="8" fill="#1a2240"/>
+    <text x="545" y="390" font-size="12" font-style="italic" fill="#93a0c4" text-anchor="middle">«static»</text>
+    <text x="545" y="408" font-size="16" font-weight="700" fill="#e8ecf8" text-anchor="middle">PdfParser</text>
+    <text x="426" y="440" font-size="13" fill="#cdd5ee">+ parseDocument(doc): Result</text>
+    <text x="426" y="464" font-size="13" fill="#cdd5ee">+ parseSection(doc, section,</text>
+    <text x="442" y="486" font-size="13" fill="#93a0c4">{ timeoutMs }): Result</text>
+  </g>
+
+  <!-- Error base -->
+  <g>
+    <rect x="790" y="352" width="190" height="64" rx="8" fill="#131a2e" stroke="#283358"/>
+    <rect x="790" y="352" width="190" height="36" rx="8" fill="#1a2240"/>
+    <rect x="790" y="380" width="190" height="8" fill="#1a2240"/>
+    <text x="885" y="376" font-size="16" font-weight="700" font-style="italic" fill="#e8ecf8" text-anchor="middle">Error</text>
+    <text x="806" y="402" font-size="12" fill="#93a0c4">name, message</text>
+  </g>
+
+  <!-- CorruptedSectionError -->
+  <g>
+    <rect x="1040" y="322" width="170" height="72" rx="8" fill="#131a2e" stroke="#46d39a"/>
+    <text x="1125" y="346" font-size="14" font-weight="700" fill="#e8ecf8" text-anchor="middle">CorruptedSectionError</text>
+    <circle cx="1056" cy="372" r="4" fill="#46d39a"/>
+    <text x="1066" y="376" font-size="12" fill="#46d39a">recoverable = true</text>
+  </g>
+  <!-- ParseTimeoutError -->
+  <g>
+    <rect x="1040" y="412" width="170" height="72" rx="8" fill="#131a2e" stroke="#ffcf5c"/>
+    <text x="1125" y="436" font-size="14" font-weight="700" fill="#e8ecf8" text-anchor="middle">ParseTimeoutError</text>
+    <circle cx="1056" cy="462" r="4" fill="#ffcf5c"/>
+    <text x="1066" y="466" font-size="12" fill="#ffcf5c">recoverable = true</text>
+  </g>
+  <!-- PasswordProtectedError -->
+  <g>
+    <rect x="1040" y="502" width="190" height="72" rx="8" fill="#131a2e" stroke="#ff6b6b"/>
+    <text x="1135" y="526" font-size="14" font-weight="700" fill="#e8ecf8" text-anchor="middle">PasswordProtectedError</text>
+    <circle cx="1056" cy="552" r="4" fill="#ff6b6b"/>
+    <text x="1066" y="556" font-size="12" fill="#ff6b6b">recoverable = false</text>
+  </g>
+
+  <!-- subclasses inherit Error -->
+  <line x1="1040" y1="358" x2="982" y2="378" stroke="#93a0c4" stroke-width="1.4" marker-end="url(#inherit)"/>
+  <line x1="1040" y1="448" x2="982" y2="392" stroke="#93a0c4" stroke-width="1.4" marker-end="url(#inherit)"/>
+  <line x1="1040" y1="538" x2="982" y2="406" stroke="#93a0c4" stroke-width="1.4" marker-end="url(#inherit)"/>
+
+  <!-- PdfParser throws Error -->
+  <line x1="680" y1="420" x2="788" y2="384" stroke="#93a0c4" stroke-width="1.4" stroke-dasharray="6 5" marker-end="url(#open)"/>
+  <text x="690" y="412" font-size="12" font-style="italic" fill="#93a0c4">«throws»</text>
+
+  <!-- ============ SUBAGENT ROW ============ -->
+  <!-- interface DocumentSubagent -->
+  <g>
+    <rect x="470" y="600" width="300" height="104" rx="8" fill="#131a2e" stroke="#6ea8ff"/>
+    <rect x="470" y="600" width="300" height="46" rx="8" fill="#243056"/>
+    <rect x="470" y="638" width="300" height="8" fill="#243056"/>
+    <text x="620" y="620" font-size="12" font-style="italic" fill="#6ea8ff" text-anchor="middle">«interface»</text>
+    <text x="620" y="638" font-size="16" font-weight="700" font-style="italic" fill="#e8ecf8" text-anchor="middle">DocumentSubagent</text>
+    <line x1="470" y1="660" x2="770" y2="660" stroke="#283358"/>
+    <text x="486" y="684" font-size="13" fill="#cdd5ee">+ process(doc): Result</text>
+  </g>
+
+  <!-- Result type note -->
+  <g>
+    <rect x="70" y="600" width="350" height="104" rx="8" fill="#0d1a33" stroke="#6ea8ff" stroke-dasharray="6 5"/>
+    <text x="86" y="624" font-size="13" fill="#e8ecf8">Result {</text>
+    <text x="100" y="646" font-size="12" fill="#cdd5ee">status, extracted, partial,</text>
+    <text x="100" y="668" font-size="12" fill="#cdd5ee">warnings, attempts, error?</text>
+    <text x="86" y="690" font-size="13" fill="#e8ecf8">}</text>
+  </g>
+  <line x1="420" y1="672" x2="468" y2="672" stroke="#93a0c4" stroke-width="1.4" stroke-dasharray="6 5" marker-end="url(#open)"/>
+  <text x="424" y="666" font-size="11" font-style="italic" fill="#93a0c4">returns</text>
+
+  <!-- NaiveDocumentSubagent -->
+  <g>
+    <rect x="70" y="752" width="350" height="150" rx="8" fill="#131a2e" stroke="#ff6b6b"/>
+    <rect x="70" y="752" width="350" height="36" rx="8" fill="#3a2230"/>
+    <rect x="70" y="780" width="350" height="8" fill="#3a2230"/>
+    <text x="245" y="776" font-size="16" font-weight="700" fill="#e8ecf8" text-anchor="middle">NaiveDocumentSubagent</text>
+    <text x="86" y="814" font-size="13" fill="#cdd5ee">+ id: string</text>
+    <text x="86" y="838" font-size="13" fill="#cdd5ee">+ process(doc): Result</text>
+    <text x="86" y="870" font-size="12" fill="#ff6b6b">// throws on ANY failure</text>
+    <text x="86" y="888" font-size="12" fill="#ff6b6b">// no partials, no context</text>
+  </g>
+
+  <!-- ResilientDocumentSubagent -->
+  <g>
+    <rect x="470" y="752" width="700" height="190" rx="8" fill="#131a2e" stroke="#46d39a"/>
+    <rect x="470" y="752" width="700" height="36" rx="8" fill="#1f3a2e"/>
+    <rect x="470" y="780" width="700" height="8" fill="#1f3a2e"/>
+    <text x="820" y="776" font-size="16" font-weight="700" fill="#e8ecf8" text-anchor="middle">ResilientDocumentSubagent  ✅ the answer</text>
+    <text x="486" y="814" font-size="13" fill="#cdd5ee">+ id: string</text>
+    <text x="486" y="838" font-size="13" fill="#cdd5ee">+ process(doc): Result</text>
+    <text x="486" y="870" font-size="12" fill="#46d39a">// skip CorruptedSectionError → degrade</text>
+    <text x="486" y="892" font-size="12" fill="#ffcf5c">// retry ParseTimeoutError (≤3, widen budget)</text>
+    <text x="486" y="914" font-size="12" fill="#ff6b6b">// escalate PasswordProtectedError + context</text>
+  </g>
+
+  <!-- realization naive -> interface -->
+  <line x1="245" y1="752" x2="560" y2="704" stroke="#93a0c4" stroke-width="1.4" stroke-dasharray="6 5" marker-end="url(#inherit)"/>
+  <!-- realization resilient -> interface -->
+  <line x1="700" y1="752" x2="650" y2="704" stroke="#93a0c4" stroke-width="1.4" stroke-dasharray="6 5" marker-end="url(#inherit)"/>
+
+  <!-- subagents use PdfParser -->
+  <line x1="410" y1="752" x2="472" y2="512" stroke="#93a0c4" stroke-width="1.4" stroke-dasharray="6 5" marker-end="url(#open)"/>
+  <text x="406" y="744" font-size="11" font-style="italic" fill="#93a0c4">«uses»</text>
+  <line x1="545" y1="752" x2="562" y2="512" stroke="#93a0c4" stroke-width="1.4" stroke-dasharray="6 5" marker-end="url(#open)"/>
+  <text x="551" y="744" font-size="11" font-style="italic" fill="#93a0c4">«uses»</text>
+
+  <!-- resilient catches errors -->
+  <line x1="1140" y1="752" x2="1135" y2="576" stroke="#93a0c4" stroke-width="1.4" stroke-dasharray="6 5" marker-end="url(#open)"/>
+  <text x="1086" y="668" font-size="11" font-style="italic" fill="#93a0c4">«catches»</text>
+
+  <!-- ============ COORDINATOR ROW ============ -->
+  <!-- Coordinator -->
+  <g>
+    <rect x="470" y="992" width="400" height="168" rx="8" fill="#131a2e" stroke="#6ea8ff"/>
+    <rect x="470" y="992" width="400" height="36" rx="8" fill="#243056"/>
+    <rect x="470" y="1020" width="400" height="8" fill="#243056"/>
+    <text x="670" y="1016" font-size="16" font-weight="700" fill="#e8ecf8" text-anchor="middle">Coordinator</text>
+    <text x="486" y="1052" font-size="13" fill="#cdd5ee">- subagent: DocumentSubagent</text>
+    <text x="486" y="1076" font-size="13" fill="#cdd5ee">- mode: "naive" | "resilient"</text>
+    <text x="486" y="1100" font-size="13" fill="#cdd5ee">- coordinatorInterventions: number</text>
+    <line x1="486" y1="1116" x2="854" y2="1116" stroke="#283358"/>
+    <text x="486" y="1140" font-size="13" fill="#cdd5ee">+ runResearchTask(corpus): Report</text>
+  </g>
+
+  <!-- demo.js note -->
+  <g>
+    <rect x="920" y="992" width="290" height="120" rx="8" fill="#0d1a33" stroke="#6ea8ff" stroke-dasharray="6 5"/>
+    <text x="936" y="1016" font-size="15" font-weight="700" fill="#e8ecf8">demo.js  (entry)</text>
+    <text x="936" y="1044" font-size="12" fill="#cdd5ee">new Coordinator({ subagent, mode })</text>
+    <text x="936" y="1066" font-size="12" fill="#cdd5ee">+ sampleCorpus()</text>
+    <text x="936" y="1088" font-size="12" fill="#93a0c4">// runs naive vs resilient</text>
+  </g>
+
+  <!-- Coordinator delegates to interface (elbow on left margin) -->
+  <path d="M470,1076 L36,1076 L36,672 L468,672" fill="none" stroke="#6ea8ff" stroke-width="1.4" marker-end="url(#open)"/>
+  <text x="120" y="1068" font-size="12" fill="#6ea8ff">delegates  ▸  (subagent)</text>
+
+  <!-- demo.js wires Coordinator -->
+  <line x1="920" y1="1052" x2="872" y2="1052" stroke="#6ea8ff" stroke-width="1.4" stroke-dasharray="6 5" marker-end="url(#open)"/>
+  <text x="876" y="1044" font-size="11" font-style="italic" fill="#6ea8ff">«wires»</text>
+
+  <!-- demo.js uses sampleCorpus (elbow on right margin) -->
+  <path d="M1210,1012 L1226,1012 L1226,180 L1022,180" fill="none" stroke="#6ea8ff" stroke-width="1.4" stroke-dasharray="6 5" marker-end="url(#open)"/>
+  <text transform="rotate(-90 1226 600)" x="1226" y="600" font-size="11" font-style="italic" fill="#6ea8ff" text-anchor="middle">«uses» sampleCorpus()</text>
+</svg>
