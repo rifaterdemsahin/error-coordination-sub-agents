@@ -157,6 +157,28 @@
 
   footer { color: var(--muted); font-size: 13px; padding: 40px 0 60px; text-align: center; }
   a { color: var(--accent); }
+
+  /* ---- Infographic ---- */
+  .figure {
+    margin-top: 8px; border: 1px solid var(--border); border-radius: 16px;
+    background: #0d1530; padding: 14px; overflow: hidden;
+  }
+  .figure img {
+    display: block; width: 100%; height: auto; border-radius: 10px; cursor: zoom-in;
+    transition: transform .2s ease;
+  }
+  .figure .cap {
+    display: flex; justify-content: space-between; align-items: center;
+    color: var(--muted); font-size: 13px; margin-top: 10px; padding: 0 4px;
+  }
+  .figure .cap a { text-decoration: none; }
+  .lightbox {
+    position: fixed; inset: 0; background: rgba(4,8,20,.92);
+    display: none; align-items: center; justify-content: center; z-index: 50; padding: 24px;
+    cursor: zoom-out;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img { max-width: 100%; max-height: 100%; border-radius: 12px; border: 1px solid var(--border); }
 </style>
 </head>
 <body>
@@ -207,6 +229,25 @@
         <span class="pill-ok">Resolve transient issues locally · escalate only hard failures with context</span>
       </p>
     </div>
+  </section>
+
+  <!-- INFOGRAPHIC -->
+  <section>
+    <h2>🖼️ The whole idea, in one picture</h2>
+    <p class="lede" style="margin-bottom:18px">
+      A visual summary of the architectural improvement: subagents handle transient
+      failures locally and escalate only the unresolvable ones — with context.
+    </p>
+    <figure class="figure">
+      <img id="infographic"
+           src="infographic.png"
+           alt="Infographic: local recovery in subagents vs. coordinator-bottlenecked error handling"
+           loading="lazy" />
+      <figcaption class="cap">
+        <span>Infographic — local recovery &amp; structured escalation</span>
+        <a href="infographic.png" target="_blank" rel="noopener">View full size ↗</a>
+      </figcaption>
+    </figure>
   </section>
 
   <!-- INTERACTIVE SIMULATOR -->
@@ -329,6 +370,11 @@
     Open <code>demo.js</code> in Node for the runnable version ·
     <code>node demo.js</code> · resilient vs naive, side by side.
   </footer>
+</div>
+
+<!-- Lightbox for the infographic -->
+<div class="lightbox" id="lightbox" aria-hidden="true">
+  <img src="infographic.png" alt="Infographic (full size)" />
 </div>
 
 <script>
@@ -503,6 +549,18 @@ function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
 // initial paint
 renderDocs([]);
+
+// ── Lightbox for infographic ───────────────────────────────────────────────────
+(function () {
+  const img = document.getElementById("infographic");
+  const box = document.getElementById("lightbox");
+  if (!img || !box) return;
+  const open = () => box.classList.add("open");
+  const close = () => box.classList.remove("open");
+  img.addEventListener("click", open);
+  box.addEventListener("click", close);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+})();
 </script>
 </body>
 </html>
