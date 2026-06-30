@@ -429,6 +429,47 @@
 }</pre>
   </section>
 
+  <!-- ANTIGRAVITY VS CLAUDE -->
+  <section>
+    <h2>🤖 Creating Agents: Antigravity vs Claude</h2>
+    <p class="lede" style="margin-bottom:18px">
+      Building these resilient, self-recovering subagents can be approached differently depending on the ecosystem you choose. Here is how they differentiate across the What, Why, and How stages.
+    </p>
+
+    <div class="why-grid">
+      <div class="why">
+        <div class="h">What</div>
+        <p style="margin-top:8px"><strong>Antigravity:</strong> A dedicated agentic coding platform with built-in primitives for subagent orchestration, workspace branching, and tool delegation.</p>
+        <p><strong>Claude:</strong> A foundational LLM that can be wrapped in your own custom orchestration logic and tool-calling loops to act as an agent.</p>
+      </div>
+      <div class="why">
+        <div class="h">Why (Differentiation)</div>
+        <p style="margin-top:8px"><strong>Antigravity</strong> excels at deep repository integration, managing the subagent lifecycle (spawn, kill, communicate) out-of-the-box. It's built for pair-programming and complex codebase tasks.</p>
+        <p><strong>Claude</strong> is highly adaptable. While it requires building the coordinator yourself, it allows for completely custom execution environments and integrations outside of a standard IDE context.</p>
+      </div>
+      <div class="why" style="grid-column: 1 / -1; min-height: unset;">
+        <div class="h">How</div>
+        <div style="display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 12px;">
+          <div style="border-left: 2px solid var(--accent); padding-left: 12px;">
+            <strong style="color:#e8ecf8">In Antigravity:</strong>
+            <ul style="margin-top: 6px; padding-left: 20px; color: #cdd5ee; margin-bottom: 0;">
+              <li>Use <code>define_subagent</code> to create an agent profile with a specialized system prompt and toolset.</li>
+              <li>Call <code>invoke_subagent</code> to launch instances concurrently, assigning specific roles (e.g., "Corpus Reader").</li>
+              <li>The subagent's prompt instructs it to handle local failures using its tools. Unresolvable errors are sent back to the parent via <code>send_message</code>.</li>
+            </ul>
+          </div>
+          <div style="border-left: 2px solid var(--green); padding-left: 12px;">
+            <strong style="color:#e8ecf8">In Claude:</strong>
+            <ul style="margin-top: 6px; padding-left: 20px; color: #cdd5ee; margin-bottom: 0;">
+              <li>Define a strict system prompt instructing Claude to return structured JSON adhering to an escalation contract.</li>
+              <li>Provide tool definitions (via the Anthropic API) that Claude can invoke to attempt local recovery.</li>
+              <li>Write a custom orchestrator (the "coordinator") in Node/Python that parses Claude's tool use, executes the local functions, and handles final escalations.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
   <footer>
     Open <code>demo.js</code> in Node for the runnable version ·
     <code>node demo.js</code> · resilient vs naive, side by side.
