@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Error Coordination: Subagent Local Recovery</title>
+<style>
+  :root {
+    --bg: #0b1020;
+    --panel: #131a2e;
+    --panel-2: #1a2240;
+    --ink: #e8ecf8;
+    --muted: #93a0c4;
+    --accent: #6ea8ff;
+    --green: #46d39a;
+    --yellow: #ffcf5c;
+    --red: #ff6b6b;
+    --border: #283358;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: radial-gradient(1200px 600px at 80% -10%, #1b2a5a, transparent),
+                radial-gradient(900px 500px at -10% 0%, #142048, transparent),
+                var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+
+  header.hero { padding: 64px 0 24px; }
+  .eyebrow {
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  h1 { font-size: clamp(28px, 4vw, 44px); line-height: 1.15; margin: 12px 0 18px; }
+  h2 { font-size: 24px; margin: 0 0 12px; }
+  h3 { font-size: 17px; margin: 0 0 8px; }
+  .lede { color: var(--muted); font-size: 18px; max-width: 760px; }
+
+  section { padding: 40px 0; }
+
+  .card {
+    background: linear-gradient(180deg, var(--panel), var(--panel-2));
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+  }
+
+  .question { border-left: 3px solid var(--red); }
+  .question p { margin: 8px 0; color: #cdd5ee; }
+  .failure-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .tag {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.03);
+  }
+
+  .answer {
+    border: 1px solid #2c6d4f;
+    background: linear-gradient(180deg, #10241c, #0d1d2a);
+    border-radius: 16px;
+    padding: 24px;
+    margin-top: 20px;
+  }
+  .answer .pick { color: var(--green); font-family: var(--mono); font-size: 13px; letter-spacing: 0.1em; }
+  .answer p { margin: 10px 0; }
+  .pill-ok { color: var(--green); }
+  .pill-bad { color: var(--red); text-decoration: line-through; opacity: .8; }
+
+  /* ---- Simulator ---- */
+  .sim-toolbar {
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+    justify-content: space-between; margin-bottom: 18px;
+  }
+  .seg { display: inline-flex; background: #0c1428; border: 1px solid var(--border); border-radius: 10px; padding: 4px; }
+  .seg button {
+    appearance: none; border: 0; background: transparent; color: var(--muted);
+    font: inherit; padding: 8px 14px; border-radius: 7px; cursor: pointer;
+  }
+  .seg button.active { background: var(--accent); color: #06122c; font-weight: 600; }
+  .run {
+    appearance: none; cursor: pointer; border: 0;
+    background: var(--green); color: #06241a; font-weight: 700;
+    padding: 10px 18px; border-radius: 10px; font-size: 15px;
+  }
+  .run:disabled { opacity: .5; cursor: not-allowed; }
+
+  .grid { display: grid; grid-template-columns: 1fr; gap: 18px; }
+  @media (min-width: 820px) { .grid { grid-template-columns: 1.4fr 1fr; } }
+
+  .docs { display: flex; flex-direction: column; gap: 10px; }
+  .doc {
+    border: 1px solid var(--border);
+    background: #0d1530;
+    border-radius: 12px; padding: 12px 14px;
+    transition: border-color .25s, transform .25s;
+  }
+  .doc .row { display: flex; align-items: center; gap: 10px; }
+  .doc .id { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+  .doc .title { font-weight: 600; }
+  .doc .meta { margin-left: auto; display: flex; gap: 6px; }
+  .badge { font-family: var(--mono); font-size: 11px; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--border); }
+  .badge.large { color: var(--yellow); border-color: #6b5a22; }
+  .badge.corrupt { color: var(--yellow); border-color: #6b5a22; }
+  .badge.lock { color: var(--red); border-color: #6b2b2b; }
+
+  .status { font-family: var(--mono); font-size: 12px; min-height: 18px; margin-top: 8px; color: var(--muted); }
+  .status.ok { color: var(--green); }
+  .status.partial { color: var(--yellow); }
+  .status.fail { color: var(--red); }
+
+  .panel-title { font-family: var(--mono); font-size: 12px; color: var(--muted); letter-spacing: .12em; text-transform: uppercase; }
+  .metric { font-size: 40px; font-weight: 800; line-height: 1; margin: 4px 0 2px; }
+  .metric.red { color: var(--red); }
+  .metric.green { color: var(--green); }
+  .metric-label { color: var(--muted); font-size: 13px; }
+
+  .ledger {
+    margin-top: 14px; border-top: 1px dashed var(--border); padding-top: 12px;
+    max-height: 200px; overflow: auto;
+  }
+  .ledger .line { font-family: var(--mono); font-size: 12px; color: #c7d0ee; padding: 3px 0; }
+  .ledger .empty { color: var(--muted); font-size: 13px; }
+
+  .bars { display: flex; gap: 6px; margin-top: 14px; }
+  .bar { flex: 1; height: 10px; border-radius: 6px; background: #1c2748; overflow: hidden; }
+  .bar > span { display: block; height: 100%; }
+  .legend { display: flex; gap: 14px; margin-top: 8px; font-size: 12px; color: var(--muted); }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px; vertical-align: middle; }
+
+  /* ---- Why ---- */
+  .why-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+  @media (min-width: 820px) { .why-grid { grid-template-columns: 1fr 1fr; } }
+  .why { padding: 18px; border: 1px solid var(--border); border-radius: 14px; background: #0e1733; }
+  .why .h { color: var(--accent); font-weight: 700; margin-bottom: 6px; }
+
+  /* ---- Flow ---- */
+  .flow { display: flex; gap: 10px; align-items: stretch; flex-wrap: wrap; }
+  .node {
+    flex: 1; min-width: 160px; border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px; background: #0d1530;
+  }
+  .node .t { font-weight: 700; margin-bottom: 4px; }
+  .arrow { align-self: center; color: var(--muted); font-size: 20px; }
+  code { background: #0a1b34; padding: 2px 6px; border-radius: 5px; font-family: var(--mono); font-size: 13px; color: #bcd0ff; }
+  pre { background: #0a1226; border: 1px solid var(--border); border-radius: 10px; padding: 14px; overflow: auto; color: #cdd9ff; }
+
+  footer { color: var(--muted); font-size: 13px; padding: 40px 0 60px; text-align: center; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">Architectural Improvement · Subagent Error Handling</div>
+    <h1>Stop making the coordinator babysit routine failures</h1>
+    <p class="lede">
+      A document-analysis subagent keeps failing on corrupted PDFs, password-protected
+      files, and parse timeouts — and every exception throws work back to the coordinator.
+      Here's the fix, demonstrated live.
+    </p>
+  </header>
+
+  <!-- THE QUESTION -->
+  <section>
+    <div class="card question">
+      <h2>📝 The problem</h2>
+      <p>
+        The document analysis subagent frequently encounters failures when processing PDF
+        files — some have <strong>corrupted sections</strong> causing parsing exceptions,
+        others are <strong>password-protected</strong>, and occasionally the parsing library
+        <strong>times out on large files</strong>.
+      </p>
+      <p>
+        Currently, any exception immediately terminates the subagent and returns an error to
+        the coordinator, which must decide whether to <em>retry</em>, <em>skip</em> the
+        document, or <em>fail</em> the entire research task. This is causing
+        <strong>excessive coordinator involvement in routine error handling.</strong>
+      </p>
+      <div class="failure-tags">
+        <span class="tag">corrupted section → exception</span>
+        <span class="tag">password-protected → exception</span>
+        <span class="tag">large file → timeout</span>
+      </div>
+    </div>
+
+    <div class="answer">
+      <div class="pick">✅ MOST EFFECTIVE ARCHITECTURAL IMPROVEMENT</div>
+      <p>
+        Have the subagent implement <strong>local recovery for transient failures</strong>
+        and only <strong>propagate errors it cannot resolve</strong> to the coordinator —
+        including <strong>what was attempted</strong> and <strong>any partial results</strong> obtained.
+      </p>
+      <p style="color:var(--muted)">
+        <span class="pill-bad">Escalate every exception</span> &nbsp;→&nbsp;
+        <span class="pill-ok">Resolve transient issues locally · escalate only hard failures with context</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- INTERACTIVE SIMULATOR -->
+  <section>
+    <h2>🧪 Live simulator</h2>
+    <p class="lede" style="margin-bottom:18px">
+      The same 4-document research task, run two ways. Watch the
+      <em>coordinator interventions</em> counter — that's the metric for
+      "how much routine work the coordinator is being forced to handle."
+    </p>
+
+    <div class="card">
+      <div class="sim-toolbar">
+        <div class="seg" role="tablist">
+          <button id="btn-naive" class="active">Naive subagent</button>
+          <button id="btn-resilient">Resilient subagent</button>
+        </div>
+        <button class="run" id="run">▶ Run research task</button>
+      </div>
+
+      <div class="grid">
+        <div>
+          <div class="panel-title">Documents in the corpus</div>
+          <div class="docs" id="docs"></div>
+        </div>
+
+        <div>
+          <div class="panel-title">Coordinator load</div>
+          <div class="metric" id="metric">—</div>
+          <div class="metric-label" id="metric-label">interventions (triage decisions)</div>
+
+          <div class="bars" id="bars"></div>
+          <div class="legend">
+            <span><span class="dot" style="background:var(--green)"></span>success</span>
+            <span><span class="dot" style="background:var(--yellow)"></span>partial (self-recovered)</span>
+            <span><span class="dot" style="background:var(--red)"></span>failed (escalated)</span>
+          </div>
+
+          <div class="ledger" id="ledger">
+            <div class="empty">Coordinator log will appear here…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY -->
+  <section>
+    <h2>💡 Why this is the right answer</h2>
+    <div class="why-grid">
+      <div class="why">
+        <div class="h">1 · Subagents should be robust and self-contained</div>
+        To prevent the coordinator from becoming <strong>bottlenecked by routine
+        execution issues</strong>, each subagent owns its own failure domain.
+      </div>
+      <div class="why">
+        <div class="h">2 · Graceful degradation beats all-or-nothing</div>
+        Implementing <strong>local error handling</strong> lets the subagent skip a
+        corrupted section and still return the good ones (<code>status: partial</code>).
+      </div>
+      <div class="why">
+        <div class="h">3 · Escalate only what you truly can't fix</div>
+        A <strong>hard password protection</strong> can't be resolved locally — that's the
+        one thing worth bubbling up.
+      </div>
+      <div class="why">
+        <div class="h">4 · Send context, not bare exceptions</div>
+        When escalating, include <strong>what was attempted</strong> and
+        <strong>partial results</strong> — minimizing coordinator overhead while keeping
+        full visibility.
+      </div>
+    </div>
+  </section>
+
+  <!-- FLOW -->
+  <section>
+    <h2>🗺️ How a resilient subagent triages each failure</h2>
+    <div class="flow">
+      <div class="node">
+        <div class="t">Failure occurs</div>
+        <div style="color:var(--muted);font-size:13px">parser throws</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="node">
+        <div class="t">Transient &amp; recoverable?</div>
+        <div style="color:var(--muted);font-size:13px">
+          corrupted section → skip<br/>timeout → retry w/ bigger budget
+        </div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="node">
+        <div class="t">Resolved locally</div>
+        <div style="color:var(--green);font-size:13px">return success / partial</div>
+      </div>
+      <div class="arrow">↗</div>
+      <div class="node" style="border-color:#6b2b2b">
+        <div class="t" style="color:var(--red)">Unresolvable?</div>
+        <div style="color:var(--muted);font-size:13px">
+          escalate to coordinator:<br/>error + attempts + partials
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:28px">Structured escalation contract</h3>
+<pre>{
+  status: "failed",
+  documentId: "doc-03",
+  extracted: [],          // any sections salvaged before the failure
+  partial:  [],           // sections skipped or only partially parsed
+  attempts: [ … ],        // audit trail of what was tried locally
+  error: {
+    type: "PasswordProtectedError",
+    recoverable: false,   // coordinator may prompt user / fetch creds
+    attemptedLocally: [ "open" ]
+  }
+}</pre>
+  </section>
+
+  <footer>
+    Open <code>demo.js</code> in Node for the runnable version ·
+    <code>node demo.js</code> · resilient vs naive, side by side.
+  </footer>
+</div>
+
+<script>
+// ── Corpus (mirrors src/document.js) ──────────────────────────────────────────
+const CORPUS = [
+  { id: "doc-01", title: "Clean Research Paper",      sections: 3, large: false, protected: false, corruptAt: -1 },
+  { id: "doc-02", title: "Partially Corrupted Report",sections: 3, large: false, protected: false, corruptAt: 1 },
+  { id: "doc-03", title: "Confidential Memo",         sections: 1, large: false, protected: true,  corruptAt: -1 },
+  { id: "doc-04", title: "Giant Dataset Appendix",    sections: 2, large: true,  protected: false, corruptAt: -1 },
+];
+
+let mode = "naive";
+
+const btnNaive = document.getElementById("btn-naive");
+const btnResilient = document.getElementById("btn-resilient");
+btnNaive.onclick = () => setMode("naive");
+btnResilient.onclick = () => setMode("resilient");
+function setMode(m) {
+  mode = m;
+  btnNaive.classList.toggle("active", m === "naive");
+  btnResilient.classList.toggle("active", m === "resilient");
+  renderDocs([]);
+  setMetric(null);
+  setLedger(["Mode switched to " + m + " — press ▶ Run."]);
+}
+
+// ── Rendering helpers ─────────────────────────────────────────────────────────
+function docBadges(d) {
+  const b = [];
+  if (d.protected) b.push(`<span class="badge lock">🔒 password</span>`);
+  if (d.corruptAt >= 0) b.push(`<span class="badge corrupt">☣ corrupted section</span>`);
+  if (d.large) b.push(`<span class="badge large">⏱ large file</span>`);
+  return b.join("");
+}
+
+function renderDocs(results) {
+  const root = document.getElementById("docs");
+  root.innerHTML = "";
+  CORPUS.forEach((d) => {
+    const r = results.find((x) => x.documentId === d.id);
+    const statusLine = r ? statusHtml(r) : `<div class="status">queued…</div>`;
+    const el = document.createElement("div");
+    el.className = "doc";
+    el.innerHTML = `
+      <div class="row">
+        <span class="id">${d.id}</span>
+        <span class="title">${d.title}</span>
+        <span class="meta">${docBadges(d)}</span>
+      </div>
+      ${statusLine}
+    `;
+    root.appendChild(el);
+  });
+}
+
+function statusHtml(r) {
+  const map = { success: ["ok", "✅ success"], partial: ["partial", "🟡 partial — recovered locally"], failed: ["fail", "🔴 failed — escalated"] };
+  const [cls, label] = map[r.status];
+  let detail = "";
+  if (r.warnings?.length) detail = `<div class="status ${cls}" style="margin-top:4px">${r.warnings.join(" ")}</div>`;
+  if (r.error && r.status === "failed")
+    detail += `<div class="status fail" style="margin-top:2px">escalated: ${r.error.type} · recoverable=${r.error.recoverable}</div>`;
+  return `<div class="status ${cls}">${label}</div>${detail}`;
+}
+
+function setMetric(n) {
+  const el = document.getElementById("metric");
+  const lbl = document.getElementById("metric-label");
+  if (n === null) { el.textContent = "—"; el.className = "metric"; return; }
+  el.textContent = n;
+  el.className = "metric " + (n === 0 ? "green" : (mode === "resilient" && n <= 1 ? "green" : "red"));
+  lbl.textContent = "interventions (triage decisions the coordinator had to make)";
+}
+
+function setLedger(lines) {
+  const el = document.getElementById("ledger");
+  if (!lines.length) { el.innerHTML = `<div class="empty">Coordinator had nothing to triage. 🎉</div>`; return; }
+  el.innerHTML = lines.map((l) => `<div class="line">${l}</div>`).join("");
+}
+
+function setBars(results) {
+  const counts = { success: 0, partial: 0, failed: 0 };
+  results.forEach((r) => counts[r.status]++);
+  const total = results.length || 1;
+  const color = { success: "var(--green)", partial: "var(--yellow)", failed: "var(--red)" };
+  document.getElementById("bars").innerHTML = ["success","partial","failed"]
+    .map((k) => `<div class="bar"><span style="width:${(counts[k]/total)*100}%;background:${color[k]}"></span></div>`)
+    .join("");
+}
+
+// ── Simulation engines (mirror src/subagent-*.js) ─────────────────────────────
+function naiveResult(d) {
+  // First problem throws straight to the coordinator.
+  if (d.protected) throw { type: "PasswordProtectedError", recoverable: false };
+  if (d.corruptAt >= 0) throw { type: "CorruptedSectionError", recoverable: true };
+  if (d.large) throw { type: "ParseTimeoutError", recoverable: true };
+  return { status: "success", documentId: d.id, warnings: [] };
+}
+
+function resilientResult(d) {
+  const warnings = [];
+  const attempts = [];
+  if (d.protected) {
+    attempts.push({ step: "open", outcome: "password-required" });
+    return {
+      status: "failed", documentId: d.id, warnings, attempts,
+      error: { type: "PasswordProtectedError", recoverable: false, attemptedLocally: ["open"] },
+    };
+  }
+  let partial = false;
+  if (d.corruptAt >= 0) {
+    // Graceful degradation: skip the bad section, keep the rest.
+    warnings.push(`Skipped corrupted section #${d.corruptAt}; kept the other ${d.sections - 1} section(s).`);
+    partial = true;
+  }
+  if (d.large) {
+    // Local recovery: retry with a wider budget instead of escalating.
+    attempts.push({ step: "retry-timeout", outcome: "succeeded on attempt 3 (budget widened)" });
+    warnings.push(`Timeout retried locally with a larger budget — parsed on attempt 3.`);
+  }
+  return { status: partial ? "partial" : "success", documentId: d.id, warnings, attempts };
+}
+
+// ── Runner with animation ─────────────────────────────────────────────────────
+const runBtn = document.getElementById("run");
+runBtn.onclick = async () => {
+  runBtn.disabled = true;
+  const results = [];
+  const ledger = [];
+  let interventions = 0;
+  renderDocs([]);
+  setMetric(null);
+  setLedger([]);
+
+  for (const d of CORPUS) {
+    await sleep(450);
+    let r;
+    if (mode === "naive") {
+      try {
+        r = naiveResult(d);
+      } catch (err) {
+        interventions++;
+        ledger.push(`⚠️ triage ${d.id}: caught ${err.type} → SKIP &amp; move on`);
+        r = { status: "failed", documentId: d.id, warnings: [],
+              error: { type: err.type, recoverable: err.recoverable } };
+      }
+    } else {
+      r = resilientResult(d);
+      if (r.status === "failed") {
+        interventions++;
+        ledger.push(`🔴 escalation ${d.id}: ${r.error.type} (recoverable=${r.error.recoverable}) → coordinator decides`);
+      }
+    }
+    results.push(r);
+    renderDocs(results);
+    setMetric(interventions);
+    setLedger(ledger);
+    setBars(results);
+  }
+
+  await sleep(300);
+  if (mode === "naive") {
+    ledger.push(`<strong style="color:var(--red)">Result: ${interventions} interventions — coordinator buried in routine errors.</strong>`);
+  } else {
+    ledger.push(`<strong style="color:var(--green)">Result: ${interventions} intervention — only the unresolvable password case escalated, with context.</strong>`);
+  }
+  setLedger(ledger);
+  runBtn.disabled = false;
+};
+
+function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
+
+// initial paint
+renderDocs([]);
+</script>
+</body>
+</html>

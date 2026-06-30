@@ -1,0 +1,14 @@
+{
+  "name": "error-coordination-sub-agents",
+  "description": "Demonstration of local error recovery in subagents vs. coordinator-bottlenecked error handling.",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "demo.js",
+  "scripts": {
+    "start": "node demo.js",
+    "naive": "node demo.js --naive",
+    "resilient": "node demo.js --resilient"
+  },
+  "keywords": ["subagents", "coordinator", "error-handling", "resilience", "multi-agent"],
+  "license": "MIT"
+}
