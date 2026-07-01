@@ -598,7 +598,7 @@ The objective of this repository is to transform an abstract architectural exam 
    - **The Anti-Pattern (Naive Approach)**: Demonstrating the common pitfalls (e.g., lack of local error handling, unhandled exception bubbling, tight coupling, synchronous bottlenecks, or excessive coordinator overhead).
    - **The Answer (Resilient Approach)**: Demonstrating the recommended architectural pattern (e.g., local error recovery, structured escalation, graceful degradation, circuit breaking, decoupling, or bounded retries).
 3. **Quantifiable Metrics & Input Token Stats**: Define clear architectural metrics (e.g., *Coordinator Interventions*, *Error Recovery Rate*, *System Latency*, *Throughput*, *Memory Consumption*, and *Input Token Consumption*) that quantitatively prove the superiority of the resilient approach. You MUST include a dedicated **Input Token Stats & Efficiency Scoreboard** at the bottom of the simulator page (\`index.html\`), CLI tables (\`demo.js\`), and \`README.md\` demonstrating input token savings!
-4. **Interactive Web Simulator (\`index.html\` via Pico.css & htmx)**: Build a self-contained, responsive HTML/CSS/JS web page using **Pico.css** (via CDN \`<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">\` for clean, responsive classless semantic styling and dark mode) and **htmx** (via CDN \`<script src="https://unpkg.com/htmx.org@2.0.4"></script>\` for dynamic DOM interactions, responsive tab switching, and real-time simulation updates without full page reloads).
+4. **Interactive Web Simulator (\`index.html\` via Pico.css & htmx)**: Build a self-contained, responsive HTML/CSS/JS web page using **Pico.css** (via CDN \`<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">\` for clean, responsive classless semantic styling and dark mode) and **htmx** (via CDN \`<script src="https://unpkg.com/htmx.org@2.0.4"><\\/script>\` for dynamic DOM interactions, responsive tab switching, and real-time simulation updates without full page reloads).
 5. **Step-by-Step "How, What & Why" Visual Explanations (Embedded in \`index.html\`)**: At each execution step (Step 0 through Step 4), you MUST generate a visual image or architectural illustration (using your image generation tool e.g. \`generate_image\`, SVG diagrams, or canvas graphics) that explains:
    - **WHAT** is happening at this architectural layer/stage.
    - **WHY** the resilient pattern is superior to the naive anti-pattern here.
@@ -681,7 +681,7 @@ You must create the following directory structure inside the \`<project-name>\` 
 ### Step 3: Visually Stunning Responsive Web Simulator (\`index.html\` via Pico.css & htmx)
 - Build a standalone HTML/CSS/JS web interface utilizing **Pico.css** and **htmx** with **state-of-the-art responsive aesthetics**:
   - Link **Pico.css** (\`<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">\`) for responsive semantic layouts, clean grid systems, and built-in dark mode support.
-  - Link **htmx** (\`<script src="https://unpkg.com/htmx.org@2.0.4"></script>\`) to power dynamic DOM updates, scenario switching tabs, and interactive simulation controls without full page reloads.
+  - Link **htmx** (\`<script src="https://unpkg.com/htmx.org@2.0.4"><\\/script>\`) to power dynamic DOM updates, scenario switching tabs, and interactive simulation controls without full page reloads.
   - Deep dark mode color palette with glassmorphic cards, custom styling overrides, and subtle gradients.
   - Modern typography (e.g., Google Fonts: Inter, Roboto, or Outfit).
   - Smooth hover effects, transitions, and micro-animations.
@@ -893,8 +893,10 @@ Execute the steps above sequentially and thoroughly. When finished, print the CL
       }
       
       if (outputEl) {
+        outputEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        outputEl.style.transition = 'all 0.3s ease';
         outputEl.style.borderColor = 'var(--primary)';
-        outputEl.style.boxShadow = '0 0 30px rgba(0, 240, 255, 0.4)';
+        outputEl.style.boxShadow = '0 0 30px rgba(0, 240, 255, 0.6)';
       }
       
       setTimeout(() => {
