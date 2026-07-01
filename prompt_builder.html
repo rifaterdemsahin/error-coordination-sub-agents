@@ -551,8 +551,13 @@ The objective of this repository is to transform an abstract architectural exam 
    - **The Answer (Resilient Approach)**: Demonstrating the recommended architectural pattern (e.g., local error recovery, structured escalation, graceful degradation, circuit breaking, decoupling, or bounded retries).
 3. **Quantifiable Metrics**: Define clear architectural metrics (e.g., *Coordinator Interventions*, *Error Recovery Rate*, *System Latency*, *Throughput*, or *Memory Consumption*) that quantitatively prove the superiority of the resilient approach.
 4. **Interactive Web Simulator (\`index.html\`)**: Build a self-contained, visually stunning vanilla HTML/CSS/JS page that simulates the runtime behavior in the browser with real-time animated counters, log feeds, and side-by-side comparison toggles.
-5. **Visual Documentation**: Generate UML diagrams (static class structure and dynamic sequence/workflow) and a comprehensive, publication-ready \`README.md\`.
-6. **Automated Verification & Git Push**: Execute the demo script to verify correctness, then initialize git, stage, commit, and push the repository directly to GitHub.
+5. **Step-by-Step "How, What & Why" Visual Explanations (Embedded in \`index.html\`)**: At each execution step (Step 0 through Step 4), you MUST generate a visual image or architectural illustration (using your image generation tool e.g. \`generate_image\`, SVG diagrams, or canvas graphics) that explains:
+   - **WHAT** is happening at this architectural layer/stage.
+   - **WHY** the resilient pattern is superior to the naive anti-pattern here.
+   - **HOW** it functions under the hood.
+   You MUST embed all of these generated visual explanation diagrams directly into a dedicated **"How, What & Why" Walkthrough Section** inside \`index.html\` (and reference them in \`README.md\`).
+6. **Visual Documentation**: Generate UML diagrams (static class structure and dynamic sequence/workflow) and a comprehensive, publication-ready \`README.md\`.
+7. **Automated Verification & Git Push**: Execute the demo script to verify correctness, then initialize git, stage, commit, and push the repository directly to GitHub.
 
 ---
 
@@ -567,6 +572,7 @@ The objective of this repository is to transform an abstract architectural exam 
    cd <project-name>
    git init -b main
    \`\`\`
+3. 🎨 **Visual Explanation Image (Step 0)**: Generate an introductory architectural concept illustration explaining **WHAT** the core bottleneck is and **WHY** the recommended solution resolves it. Save to \`docs/\` and prepare to embed in \`index.html\`.
 
 ---
 
@@ -580,9 +586,10 @@ You must create the following directory structure inside the \`<project-name>\` 
 ├── demo.js                    # CLI runner executing both scenarios & printing comparative ascii tables
 ├── index.html                 # Interactive visual simulator (modern aesthetics, dark mode, micro-animations)
 ├── README.md                  # Comprehensive documentation (Question, Answer, Quickstart, Architecture Walkthrough)
-├── docs/                      # Visual architecture diagrams
+├── docs/                      # Visual architecture diagrams & generated step explanation images
 │   ├── uml-class.svg          # Static class & interface structure
-│   └── uml-workflow.svg       # Runtime sequence diagram showing error triage & escalation
+│   ├── uml-workflow.svg       # Runtime sequence diagram showing error triage & escalation
+│   └── step-images/           # Step-by-step How, What & Why visual illustrations
 └── src/                       # Core domain and implementation modules
     ├── domain.js              # Domain model, data entities, and simulated test corpus/workload
     ├── infrastructure.js      # Simulated I/O, network, or external services (with typed error classes)
@@ -601,6 +608,7 @@ You must create the following directory structure inside the \`<project-name>\` 
 - **Typed Errors as Architectural Seams**: Define distinct error classes (e.g., \`TransientError\` tagged with \`recoverable: true\` vs. \`FatalError\` tagged with \`recoverable: false\`) so callers can programmatically branch on failure type.
 - **Duck-Typed Contract**: Both the naive and resilient implementations must implement the exact same interface (e.g., \`async process(item) -> Result\`) allowing the coordinator to execute either interchangeably.
 - **Structured Escalation Contract**: In the resilient implementation, catch transient errors locally (retry, fallback, or degrade). When escalating unresolvable errors, return a structured result (\`status\`, \`partialResults\`, \`attemptLog\`, \`errorContext\`) rather than throwing raw exceptions.
+- 🎨 **Visual Explanation Image (Step 1)**: Generate an illustration explaining **HOW** typed errors act as architectural seams and **WHY** structured escalation prevents coordinator overload. Save to \`docs/\` and prepare to embed in \`index.html\`.
 
 ---
 
@@ -609,6 +617,7 @@ You must create the following directory structure inside the \`<project-name>\` 
 - Execute the simulated workload under both scenarios and aggregate metrics.
 - Output clean, professional ascii comparison tables showing the exact metric contrast (e.g., coordinator interventions dropping from \`3\` down to \`1\`).
 - Support command-line flags: \`--naive\` (run naive only), \`--resilient\` (run resilient only), and default (run both side-by-side).
+- 🎨 **Visual Explanation Image (Step 2)**: Generate an illustration showing **HOW** the CLI benchmarking engine executes naive vs. resilient workflows side-by-side. Save to \`docs/\` and prepare to embed in \`index.html\`.
 
 ---
 
@@ -622,6 +631,7 @@ You must create the following directory structure inside the \`<project-name>\` 
   - Scenario toggle (Naive vs. Resilient vs. Side-by-Side).
   - Animated metric scoreboards comparing coordinator interventions, success rates, and local recoveries.
   - Real-time event log viewer detailing what occurred at each step.
+- 🎨 **Visual Explanation Image (Step 3) & EMBEDDING**: Generate a UI architecture illustration explaining **HOW** the browser simulation visualizes real-time metrics. **CRITICAL REQUIREMENT: Embed all generated step images (from Steps 0, 1, 2, and 3) directly into \`index.html\`** inside elegant glassmorphic cards with clear captions explaining the How, What, and Why for each step!
 
 ---
 
@@ -635,6 +645,7 @@ You must create the following directory structure inside the \`<project-name>\` 
   - Side-by-side outcome summary table.
   - Detailed module explanation and architectural rationale.
   - Key code snippets highlighting the difference between naive bubbling and resilient local recovery.
+- 🎨 **Visual Explanation Image (Step 4)**: Generate an overall system summary illustration and ensure all step explanation images are embedded into \`README.md\` alongside the walkthrough.
 
 ---
 
