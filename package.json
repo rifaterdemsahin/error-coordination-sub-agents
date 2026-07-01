@@ -7,8 +7,19 @@
   "scripts": {
     "start": "node demo.js",
     "naive": "node demo.js --naive",
-    "resilient": "node demo.js --resilient"
+    "resilient": "node demo.js --resilient",
+    "dev": "http-server -p 8888 -c-1 .",
+    "serve": "http-server -p 8888 -c-1 ."
   },
-  "keywords": ["subagents", "coordinator", "error-handling", "resilience", "multi-agent"],
-  "license": "MIT"
+  "keywords": [
+    "subagents",
+    "coordinator",
+    "error-handling",
+    "resilience",
+    "multi-agent"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
 }
