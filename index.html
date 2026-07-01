@@ -700,31 +700,32 @@ renderDocs([]);
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
 })();
 
-// ── Interactive Audio Narrator & Auto-Following Walkthrough ─────────────────────
+// ── AI-Generated MP3 Audio Narrator & Auto-Following Walkthrough ───────────────
 let synth = window.speechSynthesis;
+let currentAudio = null;
 let isSpeaking = false;
 let walkIndex = 0;
 const sectionsList = [
-  { id: "sec-hero", name: "Introduction" },
-  { id: "sec-problem", name: "The Problem & Solution" },
-  { id: "sec-infographic", name: "Visual Summary" },
-  { id: "sec-simulator", name: "Live Simulator" },
-  { id: "sec-why", name: "Why This Is The Right Answer" },
-  { id: "sec-arch", name: "Architecture & Modules" },
-  { id: "sec-flow", name: "Triage Workflow" },
-  { id: "sec-compare", name: "Antigravity vs Claude" }
+  { id: "sec-hero", name: "Introduction", mp3: "audio/intro.mp3" },
+  { id: "sec-problem", name: "The Problem & Solution", mp3: "audio/step-0.mp3" },
+  { id: "sec-infographic", name: "Visual Summary", mp3: "audio/step-1.mp3" },
+  { id: "sec-simulator", name: "Live Simulator", mp3: "audio/step-2.mp3" },
+  { id: "sec-why", name: "Why This Is The Right Answer", mp3: "audio/step-3.mp3" },
+  { id: "sec-arch", name: "Architecture & Modules", mp3: "audio/step-3-arch.mp3" },
+  { id: "sec-flow", name: "Triage Workflow", mp3: "audio/step-3-flow.mp3" },
+  { id: "sec-compare", name: "Antigravity vs Claude", mp3: "audio/step-4.mp3" }
 ];
 
 function toggleReadWalkthrough(targetId) {
-  if (!synth) {
-    alert("Web Speech API is not supported in this browser.");
-    return;
-  }
   const masterBtnText = document.getElementById("readWalkthroughText");
   const masterBtn = document.getElementById("readWalkthroughBtn");
 
-  if (isSpeaking || synth.speaking) {
-    synth.cancel();
+  if (isSpeaking || (synth && synth.speaking) || currentAudio) {
+    if (synth) synth.cancel();
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio = null;
+    }
     isSpeaking = false;
     clearAllHighlights();
     if (masterBtnText) masterBtnText.innerText = "Read Walkthrough & Auto-Follow";
@@ -784,17 +785,11 @@ function speakSection(index, continueNext) {
   el.style.boxShadow = "0 0 35px rgba(110, 168, 255, 0.4)";
   el.style.border = "1px solid var(--accent)";
 
-  const textToRead = el.innerText;
-  synth.cancel();
-  const utterance = new SpeechSynthesisUtterance(textToRead);
-  utterance.rate = 1.0;
-  utterance.pitch = 1.0;
+  isSpeaking = true;
+  if (synth) synth.cancel();
+  if (currentAudio) { currentAudio.pause(); currentAudio = null; }
 
-  utterance.onstart = () => {
-    isSpeaking = true;
-  };
-
-  utterance.onend = () => {
+  const finishSection = () => {
     if (continueNext && isSpeaking) {
       setTimeout(() => speakSection(index + 1, true), 400);
     } else {
@@ -807,12 +802,31 @@ function speakSection(index, continueNext) {
     }
   };
 
-  utterance.onerror = () => {
-    isSpeaking = false;
-    clearAllHighlights();
+  // 1. Try playing AI-generated MP3 audio file first
+  const audio = new Audio(s.mp3);
+  currentAudio = audio;
+  audio.onended = () => {
+    currentAudio = null;
+    finishSection();
   };
-
-  synth.speak(utterance);
+  audio.onerror = () => {
+    currentAudio = null;
+    // 2. Seamless fallback to built-in Web Speech API if MP3 file is not available
+    if (!synth) {
+      finishSection();
+      return;
+    }
+    const textToRead = el.innerText;
+    const utterance = new SpeechSynthesisUtterance(textToRead);
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    utterance.onend = finishSection;
+    utterance.onerror = finishSection;
+    synth.speak(utterance);
+  };
+  audio.play().catch(() => {
+    if (audio.onerror) audio.onerror();
+  });
 }
 </script>
 </body>
