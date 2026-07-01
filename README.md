@@ -53,6 +53,17 @@ coordinator-intervention counter (the metric for "how much routine work the coor
 being forced to handle"). Additionally, `prompt_builder.html` provides a dynamic UI to generate
 master AI prompts for creating new Claude AI Architect exam projects from scratch.
 
+### ⚡ Automated Startup (`agy` Login Routine)
+
+When logging into or starting an Antigravity CLI (`agy`) session in this workspace, project rules
+in `.agents/AGENTS.md` automatically launch the local dev server and open the pages inside the **Wave**
+browser. You can also trigger this routine manually at any time:
+
+```bash
+./agy_login.sh           # starts dev server (port 8888) & launches Wave browser
+npm run wave             # opens localhost pages in Wave browser
+```
+
 ## Project layout
 
 ```
@@ -60,6 +71,8 @@ demo.js                       # CLI demo — naive vs resilient, side by side
 index.html                    # interactive visual explanation + simulator
 prompt_builder.html           # interactive prompt builder for new exam demos
 init_prompt.md                # master AI initialization prompt template
+agy_login.sh                  # automated startup script for agy login & Wave launch
+.agents/AGENTS.md             # workspace rules automating startup on agy session login
 docs/
   uml-class.svg               # class diagram (static structure & relationships)
   uml-workflow.svg            # sequence diagram (runtime workflow)

@@ -9,7 +9,8 @@
     "naive": "node demo.js --naive",
     "resilient": "node demo.js --resilient",
     "dev": "http-server -p 8888 -c-1 .",
-    "serve": "http-server -p 8888 -c-1 ."
+    "serve": "http-server -p 8888 -c-1 .",
+    "wave": "open -a Wave http://localhost:8888/prompt_builder.html && open -a Wave http://localhost:8888/index.html"
   },
   "keywords": [
     "subagents",
