@@ -42,15 +42,30 @@ The objective of this repository is to transform an abstract architectural exam 
 3. **Quantifiable Metrics**: Define clear architectural metrics (e.g., *Coordinator Interventions*, *Error Recovery Rate*, *System Latency*, *Throughput*, or *Memory Consumption*) that quantitatively prove the superiority of the resilient approach.
 4. **Interactive Web Simulator (`index.html`)**: Build a self-contained, visually stunning vanilla HTML/CSS/JS page that simulates the runtime behavior in the browser with real-time animated counters, log feeds, and side-by-side comparison toggles.
 5. **Visual Documentation**: Generate UML diagrams (static class structure and dynamic sequence/workflow) and a comprehensive, publication-ready `README.md`.
-6. **Automated Verification & Git Push**: Execute the demo script to verify correctness, then stage, commit, and push the repository to remote.
+6. **Automated Verification & Git Push**: Execute the demo script to verify correctness, then initialize git, stage, commit, and push the repository directly to GitHub.
+
+---
+
+## 🛠️ Step-by-Step Execution Plan
+
+### Step 0: Analyze Scenario & Initialize Workspace
+1. **Determine Project & Repository Name**: Analyze the Exam Question and Answer above. Invent a clean, descriptive, kebab-case project folder name (e.g., `distributed-cache-stampede-demo` or `api-rate-limiter-resilience`) that represents the architectural pattern being demonstrated. Let `<project-name>` be this derived name. Let `<github-username>` be the user's GitHub username (or default to `rifaterdemsahin`).
+2. **Create & Initialize Local Directory**:
+   Open your terminal and create the local project folder:
+   ```bash
+   mkdir -p <project-name>
+   cd <project-name>
+   git init -b main
+   ```
 
 ---
 
 ## 📁 Required Project Layout
 
-Create the following directory structure and modular architecture:
+You must create the following directory structure inside the `<project-name>` folder:
 
 ```
+<project-name>/
 ├── package.json               # ESM configuration ("type": "module"), script commands ("start", "naive", "resilient")
 ├── demo.js                    # CLI runner executing both scenarios & printing comparative ascii tables
 ├── index.html                 # Interactive visual simulator (modern aesthetics, dark mode, micro-animations)
@@ -70,8 +85,6 @@ Create the following directory structure and modular architecture:
 *(Note: Adapt module filenames inside `src/` to reflect the specific domain of the exam question, such as `document.js`, `pdf-parser.js`, `cache-layer.js`, or `database-pool.js`.)*
 
 ---
-
-## 🛠️ Step-by-Step Execution Plan
 
 ### Step 1: Domain Modeling & Simulated Infrastructure (`src/`)
 - **No Dependency Cycles**: Ensure a unidirectional dependency chain: `domain` → `infrastructure/service` → `subagent implementations` → `coordinator` → `entry point`.
@@ -111,22 +124,30 @@ Create the following directory structure and modular architecture:
 - Run `node demo.js` via terminal to verify zero syntax errors, proper import resolution, and accurate metric calculation.
 - Verify that all visual assets and scripts are correctly linked and functional.
 
-### Step 6: Git Commit & Push
+### Step 6: Git Commit & GitHub Push
 - Stage all generated project files:
   ```bash
   git add .
   ```
 - Commit with a descriptive semantic message:
   ```bash
-  git commit -m "feat: demonstrate architectural solution for <exam-topic>"
+  git commit -m "feat: demonstrate architectural solution for <project-name>"
   ```
-- Push the repository to the remote branch:
+- **Create and Push to GitHub Repository**:
+  Use the GitHub CLI (`gh`) to automatically create the remote repository and push:
   ```bash
-  git push origin main
+  gh repo create <github-username>/<project-name> --public --source=. --remote=origin --push
   ```
+  *(Alternative fallback if `gh` is unavailable: create the repository manually on GitHub, then run:*
+  ```bash
+  git remote add origin https://github.com/<github-username>/<project-name>.git
+  git branch -M main
+  git push -u origin main
+  ```
+  *)*
 
 ---
 
 ## 🚀 Final Deliverable Instructions
-Execute the steps above sequentially and thoroughly. When finished, print the CLI verification output, confirm the successful git push, and provide clickable links to the generated `README.md` and `index.html` files.
+Execute the steps above sequentially and thoroughly. When finished, print the CLI verification output, confirm the successful git push to GitHub (`https://github.com/<github-username>/<project-name>`), and provide clickable links to the generated `README.md` and `index.html` files.
 ```

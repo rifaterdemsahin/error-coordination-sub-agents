@@ -393,58 +393,26 @@
             Scenario Configuration
           </div>
         </div>
-
-        <div class="presets-container">
-          <span class="presets-label">⚡ Quick Presets:</span>
-          <div class="preset-buttons">
-            <button type="button" class="btn-preset active" onclick="loadPreset('error-coordination')">Sub-agent Error Coordination</button>
-            <button type="button" class="btn-preset" onclick="loadPreset('rate-limiting')">Distributed Rate Limiting</button>
-            <button type="button" class="btn-preset" onclick="loadPreset('cache-stampede')">Multi-Region Cache Stampede</button>
-          </div>
-        </div>
-
         <form id="promptForm" onsubmit="return false;">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="folderName">Folder / Project Name <span>(local directory)</span></label>
-              <input type="text" id="folderName" value="error-coordination-sub-agents" placeholder="e.g. my-architect-demo" oninput="updatePrompt()">
-              <div class="help-text">Name of the directory created via mkdir</div>
-            </div>
-            <div class="form-group">
-              <label for="repoName">GitHub Repository Name <span>(for git push)</span></label>
-              <input type="text" id="repoName" value="rifaterdemsahin/error-coordination-sub-agents" placeholder="e.g. username/repo-name" oninput="updatePrompt()">
-              <div class="help-text">Target repo for `gh repo create` or origin push</div>
-            </div>
-          </div>
-
           <div class="form-group">
             <label for="examQuestion">Exam Question <span>(Problem / Anti-Pattern Scenario)</span></label>
-            <textarea id="examQuestion" rows="4" placeholder="Describe the system bottleneck or architectural problem..." oninput="updatePrompt()"></textarea>
+            <textarea id="examQuestion" rows="6" placeholder="Describe the system bottleneck or architectural problem..." oninput="updatePrompt()">The document analysis subagent frequently encounters failures when processing PDF files — corrupted sections, password-protected files, and parse timeouts on large files. Today any exception terminates the subagent and forces the coordinator to decide whether to retry, skip, or fail the whole task. This causes excessive coordinator involvement in routine error handling. What's the most effective architectural improvement?</textarea>
             <div class="help-text">The exact problem scenario from the exam</div>
           </div>
 
           <div class="form-group">
             <label for="examAnswer">Recommended Architectural Solution <span>(The Answer)</span></label>
-            <textarea id="examAnswer" rows="4" placeholder="Describe the recommended architectural improvement..." oninput="updatePrompt()"></textarea>
+            <textarea id="examAnswer" rows="6" placeholder="Describe the recommended architectural improvement..." oninput="updatePrompt()">Have the subagent implement local recovery for transient failures and only propagate errors it cannot resolve to the coordinator — including what was attempted and any partial results obtained.</textarea>
             <div class="help-text">The recommended design pattern to resolve the bottleneck</div>
           </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label for="repoVisibility">GitHub Repo Visibility</label>
-              <select id="repoVisibility" onchange="updatePrompt()">
-                <option value="public">Public Repository (--public)</option>
-                <option value="private">Private Repository (--private)</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="agentTarget">Target AI Assistant</label>
-              <select id="agentTarget" onchange="updatePrompt()">
-                <option value="Antigravity / Claude 3.7 Sonnet">Google Antigravity / Claude 3.7 Sonnet</option>
-                <option value="Cursor / Copilot">Cursor / GitHub Copilot</option>
-                <option value="General LLM">General Autonomous Coding Agent</option>
-              </select>
-            </div>
+          <div class="form-group">
+            <label for="repoVisibility">GitHub Repo Visibility</label>
+            <select id="repoVisibility" onchange="updatePrompt()">
+              <option value="public">Public Repository (--public)</option>
+              <option value="private">Private Repository (--private)</option>
+            </select>
+            <div class="help-text">Visibility flag when pushing to GitHub via `gh repo create`</div>
           </div>
         </form>
       </div>
@@ -480,53 +448,14 @@
   </div>
 
   <script>
-    const PRESETS = {
-      'error-coordination': {
-        folder: 'error-coordination-sub-agents',
-        repo: 'rifaterdemsahin/error-coordination-sub-agents',
-        question: `The document analysis subagent frequently encounters failures when processing PDF files — corrupted sections, password-protected files, and parse timeouts on large files. Today any exception terminates the subagent and forces the coordinator to decide whether to retry, skip, or fail the whole task. This causes excessive coordinator involvement in routine error handling. What's the most effective architectural improvement?`,
-        answer: `Have the subagent implement local recovery for transient failures and only propagate errors it cannot resolve to the coordinator — including what was attempted and any partial results obtained.`
-      },
-      'rate-limiting': {
-        folder: 'distributed-rate-limiting-demo',
-        repo: 'rifaterdemsahin/distributed-rate-limiting-demo',
-        question: `A global API gateway currently uses a synchronous centralized Redis instance to enforce API rate limits across all regions. During high-traffic flash sales, the round-trip latency to the central Redis cluster adds 120ms to every request, and intermittent network partitions between US-West and EU-Central cause global API dropouts. How should the rate limiting architecture be improved to eliminate latency bottlenecks while preventing system overload?`,
-        answer: `Implement a decentralized token-bucket rate limiter with local in-memory caching and asynchronous background synchronization. When regional connectivity is degraded, gracefully degrade to localized heuristics rather than blocking incoming API calls.`
-      },
-      'cache-stampede': {
-        folder: 'cache-stampede-resilience',
-        repo: 'rifaterdemsahin/cache-stampede-resilience',
-        question: `In an e-commerce catalog microservice, product metadata is cached in Redis with a fixed TTL of 60 minutes. When popular promotional items expire from the cache simultaneously, thousands of concurrent requests bypass the cache and query the backend relational database at once. This "cache stampede" causes database CPU utilization to spike to 100%, resulting in cascading timeouts across downstream payment and checkout services. What is the best architectural pattern to resolve this issue?`,
-        answer: `Implement proactive probabilistic early expiration (XFetch algorithm) combined with single-flight mutex locking (request coalescing) at the application layer. This ensures only a single background worker recomputes the expired item while concurrent threads continue serving the stale cached value without stressing the database.`
-      }
-    };
-
-    function loadPreset(key) {
-      const p = PRESETS[key];
-      if (!p) return;
-      document.getElementById('folderName').value = p.folder;
-      document.getElementById('repoName').value = p.repo;
-      document.getElementById('examQuestion').value = p.question;
-      document.getElementById('examAnswer').value = p.answer;
-      
-      // Update active button state
-      document.querySelectorAll('.btn-preset').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
-      
-      updatePrompt();
-    }
-
     function updatePrompt() {
-      const folderName = document.getElementById('folderName').value.trim() || 'my-architect-demo';
-      const repoName = document.getElementById('repoName').value.trim() || 'my-architect-demo';
       const visibility = document.getElementById('repoVisibility').value;
-      const targetAgent = document.getElementById('agentTarget').value;
       const question = document.getElementById('examQuestion').value.trim() || '[Insert Exam Question Here]';
       const answer = document.getElementById('examAnswer').value.trim() || '[Insert Recommended Architectural Solution Here]';
 
       const promptText = `# TASK: Generate an Architectural Demonstration Project for the Claude AI Architect Exam
 
-You are an expert Principal AI Architect and Systems Engineer (${targetAgent}). Your task is to build a complete, runnable, production-grade architectural demonstration project from scratch based on the provided **Claude AI Architect Exam** Question and Answer. You must initialize the project folder locally and push the completed repository directly to GitHub.
+You are an expert Principal AI Architect and Systems Engineer. Your task is to build a complete, runnable, production-grade architectural demonstration project from scratch based on the provided **Claude AI Architect Exam** Question and Answer. You must initialize the project folder locally and push the completed repository directly to GitHub.
 
 ## 📝 Input: Exam Scenario
 
@@ -554,12 +483,26 @@ The objective of this repository is to transform an abstract architectural exam 
 
 ---
 
+## 🛠️ Step-by-Step Execution Plan
+
+### Step 0: Analyze Scenario & Initialize Workspace
+1. **Determine Project & Repository Name**: Analyze the Exam Question and Answer above. Invent a clean, descriptive, kebab-case project folder name (e.g., \`distributed-cache-stampede-demo\` or \`api-rate-limiter-resilience\`) that represents the architectural pattern being demonstrated. Let \`<project-name>\` be this derived name. Let \`<github-username>\` be the user's GitHub username (or default to \`rifaterdemsahin\`).
+2. **Create & Initialize Local Directory**:
+   Open your terminal and create the local project folder:
+   \`\`\`bash
+   mkdir -p <project-name>
+   cd <project-name>
+   git init -b main
+   \`\`\`
+
+---
+
 ## 📁 Required Project Layout
 
-You must create the following directory structure inside the project folder:
+You must create the following directory structure inside the \`<project-name>\` folder:
 
 \`\`\`
-${folderName}/
+<project-name>/
 ├── package.json               # ESM configuration ("type": "module"), script commands ("start", "naive", "resilient")
 ├── demo.js                    # CLI runner executing both scenarios & printing comparative ascii tables
 ├── index.html                 # Interactive visual simulator (modern aesthetics, dark mode, micro-animations)
@@ -580,27 +523,21 @@ ${folderName}/
 
 ---
 
-## 🛠️ Step-by-Step Execution Plan
-
-### Step 0: Folder Creation & Workspace Initialization
-- Open your terminal and create the local project folder:
-  \`\`\`bash
-  mkdir -p ${folderName}
-  cd ${folderName}
-  git init -b main
-  \`\`\`
-
 ### Step 1: Domain Modeling & Simulated Infrastructure (\`src/\`)
 - **No Dependency Cycles**: Ensure a unidirectional dependency chain: \`domain\` → \`infrastructure/service\` → \`subagent implementations\` → \`coordinator\` → \`entry point\`.
 - **Typed Errors as Architectural Seams**: Define distinct error classes (e.g., \`TransientError\` tagged with \`recoverable: true\` vs. \`FatalError\` tagged with \`recoverable: false\`) so callers can programmatically branch on failure type.
 - **Duck-Typed Contract**: Both the naive and resilient implementations must implement the exact same interface (e.g., \`async process(item) -> Result\`) allowing the coordinator to execute either interchangeably.
 - **Structured Escalation Contract**: In the resilient implementation, catch transient errors locally (retry, fallback, or degrade). When escalating unresolvable errors, return a structured result (\`status\`, \`partialResults\`, \`attemptLog\`, \`errorContext\`) rather than throwing raw exceptions.
 
+---
+
 ### Step 2: Command-Line Demo Runner (\`demo.js\`)
 - Create an executable Node.js CLI script (\`#!/usr/bin/env node\`).
 - Execute the simulated workload under both scenarios and aggregate metrics.
 - Output clean, professional ascii comparison tables showing the exact metric contrast (e.g., coordinator interventions dropping from \`3\` down to \`1\`).
 - Support command-line flags: \`--naive\` (run naive only), \`--resilient\` (run resilient only), and default (run both side-by-side).
+
+---
 
 ### Step 3: Visually Stunning Interactive Web Simulator (\`index.html\`)
 - Build a standalone vanilla HTML/CSS/JS web interface with **state-of-the-art aesthetics**:
@@ -613,6 +550,8 @@ ${folderName}/
   - Animated metric scoreboards comparing coordinator interventions, success rates, and local recoveries.
   - Real-time event log viewer detailing what occurred at each step.
 
+---
+
 ### Step 4: Documentation & Architecture Diagrams (\`docs/\` & \`README.md\`)
 - Generate UML diagrams in \`docs/\` (as SVG files or embedded Mermaid charts):
   - **Class Diagram**: Showing static relationships, interfaces, and module structure.
@@ -624,9 +563,13 @@ ${folderName}/
   - Detailed module explanation and architectural rationale.
   - Key code snippets highlighting the difference between naive bubbling and resilient local recovery.
 
+---
+
 ### Step 5: Local Verification & Testing
 - Run \`node demo.js\` via terminal to verify zero syntax errors, proper import resolution, and accurate metric calculation.
 - Verify that all visual assets and scripts are correctly linked and functional.
+
+---
 
 ### Step 6: Git Commit & GitHub Push
 - Stage all generated project files:
@@ -635,16 +578,16 @@ ${folderName}/
   \`\`\`
 - Commit with a descriptive semantic message:
   \`\`\`bash
-  git commit -m "feat: demonstrate architectural solution for ${folderName}"
+  git commit -m "feat: demonstrate architectural solution for <project-name>"
   \`\`\`
 - **Create and Push to GitHub Repository**:
   Use the GitHub CLI (\`gh\`) to automatically create the remote repository and push:
   \`\`\`bash
-  gh repo create ${repoName} --${visibility} --source=. --remote=origin --push
+  gh repo create <github-username>/<project-name> --${visibility} --source=. --remote=origin --push
   \`\`\`
   *(Alternative fallback if \`gh\` is unavailable: create the repository manually on GitHub, then run:*
   \`\`\`bash
-  git remote add origin https://github.com/${repoName}.git
+  git remote add origin https://github.com/<github-username>/<project-name>.git
   git branch -M main
   git push -u origin main
   \`\`\`
@@ -653,7 +596,7 @@ ${folderName}/
 ---
 
 ## 🚀 Final Deliverable Instructions
-Execute the steps above sequentially and thoroughly. When finished, print the CLI verification output, confirm the successful git push to GitHub (\`https://github.com/${repoName}\`), and provide clickable local links to the generated \`README.md\` and \`index.html\` files.`;
+Execute the steps above sequentially and thoroughly. When finished, print the CLI verification output, confirm the successful git push to GitHub (\`https://github.com/<github-username>/<project-name>\`), and provide clickable local links to the generated \`README.md\` and \`index.html\` files.`;
 
       document.getElementById('promptOutput').innerText = promptText;
 
@@ -686,9 +629,9 @@ Execute the steps above sequentially and thoroughly. When finished, print the CL
       });
     }
 
-    // Initialize with default preset on load
+    // Initialize on load
     window.onload = () => {
-      loadPreset('error-coordination');
+      updatePrompt();
     };
   </script>
 </body>
