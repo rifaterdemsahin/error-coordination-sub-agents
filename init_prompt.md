@@ -20,6 +20,10 @@ This document provides a comprehensive, reusable initialization prompt designed 
 
 You are an expert Principal AI Architect and Systems Engineer. Your task is to build a complete, runnable, production-grade architectural demonstration project from scratch based on the provided **Claude AI Architect Exam** Question and Answer.
 
+## ⚡ Mandatory Initial Settings & Pre-requisites
+1. **Gemini `settings.json` Permission Access**: At the very start of your session before executing commands or modifying files, check, request, or configure your permission access grants in `/Users/rifaterdemsahin/.gemini/antigravity-cli/settings.json` (or workspace settings) so that you have automated read/write, git, and command execution access without interrupting the user by repeatedly asking for permission during project build and deployment!
+2. **Input Token Usage Stats**: You MUST track and display simulated/actual **Input Token Stats & Context Efficiency** at the bottom of the interactive web simulator (`index.html`), at the bottom of the CLI comparison table (`demo.js`), and at the bottom of `README.md` (e.g., showing how the resilient approach reduces input token consumption / coordinator overhead compared to the naive approach)!
+
 ## 📝 Input: Exam Scenario
 
 **Question:**
@@ -39,7 +43,7 @@ The objective of this repository is to transform an abstract architectural exam 
 2. **Side-by-Side Comparison (Naive vs. Resilient/Optimized)**: Implement both:
    - **The Anti-Pattern (Naive Approach)**: Demonstrating the common pitfalls (e.g., lack of local error handling, unhandled exception bubbling, tight coupling, synchronous bottlenecks, or excessive coordinator overhead).
    - **The Answer (Resilient Approach)**: Demonstrating the recommended architectural pattern (e.g., local error recovery, structured escalation, graceful degradation, circuit breaking, decoupling, or bounded retries).
-3. **Quantifiable Metrics**: Define clear architectural metrics (e.g., *Coordinator Interventions*, *Error Recovery Rate*, *System Latency*, *Throughput*, or *Memory Consumption*) that quantitatively prove the superiority of the resilient approach.
+3. **Quantifiable Metrics & Input Token Stats**: Define clear architectural metrics (e.g., *Coordinator Interventions*, *Error Recovery Rate*, *System Latency*, *Throughput*, *Memory Consumption*, and *Input Token Consumption*) that quantitatively prove the superiority of the resilient approach. You MUST include a dedicated **Input Token Stats & Efficiency Scoreboard** at the bottom of the simulator page (`index.html`), CLI tables (`demo.js`), and `README.md` demonstrating input token savings!
 4. **Interactive Web Simulator (`index.html`)**: Build a self-contained, visually stunning vanilla HTML/CSS/JS page that simulates the runtime behavior in the browser with real-time animated counters, log feeds, and side-by-side comparison toggles.
 5. **Step-by-Step "How, What & Why" Visual Explanations (Embedded in `index.html`)**: At each execution step (Step 0 through Step 4), you MUST generate a visual image or architectural illustration (using your image generation tool e.g. `generate_image`, SVG diagrams, or canvas graphics) that explains:
    - **WHAT** is happening at this architectural layer/stage.
@@ -181,5 +185,5 @@ You must create the following directory structure inside the `<project-name>` fo
 ---
 
 ## 🚀 Final Deliverable Instructions
-Execute the steps above sequentially and thoroughly. When finished, print the CLI verification output, confirm the successful git push to GitHub (`https://github.com/<github-username>/<project-name>`), confirm that the GitHub Actions static deployment has completed, confirm that you have automatically opened the live GitHub Pages URL in the browser (`https://<github-username>.github.io/<project-name>/`), and provide clickable local and live links to the generated `README.md` and `index.html` files.
+Execute the steps above sequentially and thoroughly. When finished, print the CLI verification output (including the Input Token Stats summary at the bottom), confirm the successful git push to GitHub (`https://github.com/<github-username>/<project-name>`), confirm that the GitHub Actions static deployment has completed, confirm that you have automatically opened the live GitHub Pages URL in the browser (`https://<github-username>.github.io/<project-name>/`), and provide clickable local and live links to the generated `README.md` and `index.html` files.
 ```
