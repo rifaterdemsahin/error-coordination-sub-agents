@@ -586,6 +586,9 @@ You must create the following directory structure inside the \`<project-name>\` 
 
 \`\`\`
 <project-name>/
+├── .github/
+│   └── workflows/
+│       └── static.yml         # GitHub Actions workflow for deploying static content to GitHub Pages
 ├── package.json               # ESM configuration ("type": "module"), script commands ("start", "naive", "resilient")
 ├── demo.js                    # CLI runner executing both scenarios & printing comparative ascii tables
 ├── index.html                 # Interactive visual simulator (modern aesthetics, dark mode, micro-animations)
@@ -639,7 +642,7 @@ You must create the following directory structure inside the \`<project-name>\` 
 
 ---
 
-### Step 4: Documentation & Architecture Diagrams (\`docs/\` & \`README.md\`)
+### Step 4: Documentation, Architecture Diagrams & GitHub Actions Workflow (\`docs/\`, \`README.md\`, \`.github/workflows/static.yml\`)
 - Generate UML diagrams in \`docs/\` (as SVG files or embedded Mermaid charts):
   - **Class Diagram**: Showing static relationships, interfaces, and module structure.
   - **Workflow Diagram**: Sequence diagram showing runtime flow, local recovery loops, and escalation paths.
@@ -651,6 +654,53 @@ You must create the following directory structure inside the \`<project-name>\` 
   - Detailed module explanation and architectural rationale with emojis.
   - Key code snippets highlighting the difference between naive bubbling and resilient local recovery.
 - 🎨 **Visual Explanation Image (Step 4)**: Generate an overall system summary illustration and ensure all step explanation images are embedded into \`README.md\` alongside the walkthrough.
+- **Create GitHub Actions Static Deployment Workflow**:
+  Create \`.github/workflows/static.yml\` (similar to \`https://github.com/rifaterdemsahin/hub-spoke-multi-agent-orchestrator/blob/main/.github/workflows/static.yml\`) with the exact automated deployment configuration:
+  \`\`\`yaml
+  # Simple workflow for deploying static content to GitHub Pages
+  name: Deploy static content to Pages
+
+  on:
+    # Runs on pushes targeting the default branch
+    push:
+      branches: ["main"]
+
+    # Allows you to run this workflow manually from the Actions tab
+    workflow_dispatch:
+
+  # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+  permissions:
+    contents: read
+    pages: write
+    id-token: write
+
+  # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+  # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+  concurrency:
+    group: "pages"
+    cancel-in-progress: false
+
+  jobs:
+    # Single deploy job since we're just deploying
+    deploy:
+      environment:
+        name: github-pages
+        url: \${{ steps.deployment.outputs.page_url }}
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+        - name: Setup Pages
+          uses: actions/configure-pages@v5
+        - name: Upload artifact
+          uses: actions/upload-pages-artifact@v3
+          with:
+            # Upload entire repository
+            path: '.'
+        - name: Deploy to GitHub Pages
+          id: deployment
+          uses: actions/deploy-pages@v5
+  \`\`\`
 
 ---
 
@@ -660,7 +710,7 @@ You must create the following directory structure inside the \`<project-name>\` 
 
 ---
 
-### Step 6: Git Commit, GitHub Push, Wait for Actions & Auto-Open Live Page
+### Step 6: Git Commit, GitHub Push, Enable Pages via `gh` & Auto-Open Live Page
 - Stage all generated project files:
   \`\`\`bash
   git add .
@@ -681,11 +731,15 @@ You must create the following directory structure inside the \`<project-name>\` 
   git push -u origin main
   \`\`\`
   *)*
-- **Enable GitHub Pages Static Deployment**:
-  Configure GitHub Pages to automatically serve the static web simulator (\`index.html\`) online from the \`main\` branch root (or via a \`.github/workflows/deploy-pages.yml\` workflow). The live URL will be:
+- **Enable GitHub Pages via `gh` CLI Methods**:
+  After pushing, enable GitHub Pages deployment via GitHub Actions workflow using the \`gh\` API command:
+  \`\`\`bash
+  gh api -X POST /repos/<github-username>/<project-name>/pages -f "build_type=workflow" || gh api -X PUT /repos/<github-username>/<project-name>/pages -f "build_type=workflow" || true
+  \`\`\`
+  The live URL will be:
   \`https://<github-username>.github.io/<project-name>/\`
 - **Wait for GitHub Actions Deployment & Automatically Open Page**:
-  Wait for the GitHub Actions deployment / Pages build workflow to finish executing (e.g., using \`gh run watch\` or checking \`curl -s -o /dev/null -w "%{http_code}" https://<github-username>.github.io/<project-name>/\`). Once completed and returning HTTP 200 OK, automatically launch and open the live website in the browser:
+  Wait for the GitHub Actions deployment / Pages build workflow (\`static.yml\`) to finish executing (e.g., using \`gh run watch\` or checking \`curl -s -o /dev/null -w "%{http_code}" https://<github-username>.github.io/<project-name>/\`). Once completed and returning HTTP 200 OK, automatically launch and open the live website in the browser:
   \`\`\`bash
   open "https://<github-username>.github.io/<project-name>/"
   \`\`\`
