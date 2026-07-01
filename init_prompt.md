@@ -45,9 +45,10 @@ The objective of this repository is to transform an abstract architectural exam 
    - **WHAT** is happening at this architectural layer/stage.
    - **WHY** the resilient pattern is superior to the naive anti-pattern here.
    - **HOW** it functions under the hood.
-   You MUST embed all of these generated visual explanation diagrams directly into a dedicated **"How, What & Why" Walkthrough Section** inside `index.html` (and reference them in `README.md`).
+   You MUST embed all of these generated visual explanation diagrams directly into a dedicated **"How, What & Why" Walkthrough Section** inside `index.html` (and reference them in `README.md`). **CRITICAL**: You MUST use rich, expressive emojis (e.g., 🚀, ⚡, 🛡️, ❌, ✅, 💡, 🔍, 📊, 🎯) throughout all textual explanations, captions, card headers, and diagrams to make the presentation as visually appealing, engaging, and scannable as possible!
 6. **Visual Documentation**: Generate UML diagrams (static class structure and dynamic sequence/workflow) and a comprehensive, publication-ready `README.md`.
 7. **Automated Verification & Git Push**: Execute the demo script to verify correctness, then initialize git, stage, commit, and push the repository directly to GitHub.
+8. **GitHub Pages Static Deployment**: Configure automated static deployment via GitHub Pages so the interactive web simulator (`index.html`) is publicly accessible online (e.g., `https://<github-username>.github.io/<project-name>/`), and prominently link to this live deployment URL at the top of `README.md`.
 
 ---
 
@@ -121,7 +122,7 @@ You must create the following directory structure inside the `<project-name>` fo
   - Scenario toggle (Naive vs. Resilient vs. Side-by-Side).
   - Animated metric scoreboards comparing coordinator interventions, success rates, and local recoveries.
   - Real-time event log viewer detailing what occurred at each step.
-- 🎨 **Visual Explanation Image (Step 3) & EMBEDDING**: Generate a UI architecture illustration explaining **HOW** the browser simulation visualizes real-time metrics. **CRITICAL REQUIREMENT: Embed all generated step images (from Steps 0, 1, 2, and 3) directly into `index.html`** inside elegant glassmorphic cards with clear captions explaining the How, What, and Why for each step!
+- 🎨 **Visual Explanation Image (Step 3) & EMBEDDING**: Generate a UI architecture illustration explaining **HOW** the browser simulation visualizes real-time metrics. **CRITICAL REQUIREMENT: Embed all generated step images (from Steps 0, 1, 2, and 3) directly into `index.html`** inside elegant glassmorphic cards with clear captions explaining the How, What, and Why for each step, heavily utilizing expressive emojis (🚀, ⚡, 💡, 🛡️, 🔍) for visual appeal!
 
 ---
 
@@ -130,18 +131,23 @@ You must create the following directory structure inside the `<project-name>` fo
   - **Class Diagram**: Showing static relationships, interfaces, and module structure.
   - **Workflow Diagram**: Sequence diagram showing runtime flow, local recovery loops, and escalation paths.
 - Write a publication-grade `README.md` including:
+  - 🌐 **Live Interactive Web Simulator Link**: Prominently feature the GitHub Pages URL at the very top of `README.md` (e.g., `https://<github-username>.github.io/<project-name>/` similar to `https://rifaterdemsahin.github.io/claude-cowork/`).
   - The exact Claude AI Architect Exam Question and Answer.
   - Quickstart instructions (`npm start`, `node demo.js`, `open index.html`).
   - Side-by-side outcome summary table.
-  - Detailed module explanation and architectural rationale.
+  - Detailed module explanation and architectural rationale with emojis.
   - Key code snippets highlighting the difference between naive bubbling and resilient local recovery.
 - 🎨 **Visual Explanation Image (Step 4)**: Generate an overall system summary illustration and ensure all step explanation images are embedded into `README.md` alongside the walkthrough.
 
-### Step 5: Verification & Validation
+---
+
+### Step 5: Local Verification & Testing
 - Run `node demo.js` via terminal to verify zero syntax errors, proper import resolution, and accurate metric calculation.
 - Verify that all visual assets and scripts are correctly linked and functional.
 
-### Step 6: Git Commit & GitHub Push
+---
+
+### Step 6: Git Commit, GitHub Push & GitHub Pages Static Deployment
 - Stage all generated project files:
   ```bash
   git add .
@@ -162,9 +168,12 @@ You must create the following directory structure inside the `<project-name>` fo
   git push -u origin main
   ```
   *)*
+- **Enable GitHub Pages Static Deployment**:
+  Configure GitHub Pages to automatically serve the static web simulator (`index.html`) online from the `main` branch root (or via a `.github/workflows/deploy-pages.yml` workflow). The live URL will be:
+  `https://<github-username>.github.io/<project-name>/`
 
 ---
 
 ## 🚀 Final Deliverable Instructions
-Execute the steps above sequentially and thoroughly. When finished, print the CLI verification output, confirm the successful git push to GitHub (`https://github.com/<github-username>/<project-name>`), and provide clickable links to the generated `README.md` and `index.html` files.
+Execute the steps above sequentially and thoroughly. When finished, print the CLI verification output, confirm the successful git push to GitHub (`https://github.com/<github-username>/<project-name>`), confirm GitHub Pages static deployment is enabled (`https://<github-username>.github.io/<project-name>/`), and provide clickable local and live links to the generated `README.md` and `index.html` files.
 ```
