@@ -558,7 +558,7 @@ The objective of this repository is to transform an abstract architectural exam 
    You MUST embed all of these generated visual explanation diagrams directly into a dedicated **"How, What & Why" Walkthrough Section** inside \`index.html\` (and reference them in \`README.md\`). **CRITICAL**: You MUST use rich, expressive emojis (e.g., 🚀, ⚡, 🛡️, ❌, ✅, 💡, 🔍, 📊, 🎯) throughout all textual explanations, captions, card headers, and diagrams to make the presentation as visually appealing, engaging, and scannable as possible!
 6. **Visual Documentation**: Generate UML diagrams (static class structure and dynamic sequence/workflow) and a comprehensive, publication-ready \`README.md\`.
 7. **Automated Verification & Git Push**: Execute the demo script to verify correctness, then initialize git, stage, commit, and push the repository directly to GitHub.
-8. **GitHub Pages Static Deployment**: Configure automated static deployment via GitHub Pages so the interactive web simulator (\`index.html\`) is publicly accessible online (e.g., \`https://<github-username>.github.io/<project-name>/\`), and prominently link to this live deployment URL at the top of \`README.md\`.
+8. **GitHub Pages Static Deployment & Auto-Open**: Configure automated static deployment via GitHub Pages. After pushing to GitHub, you MUST wait for the GitHub Actions deployment workflow to complete, confirm the site is live online (e.g., \`https://<github-username>.github.io/<project-name>/\`), and automatically open this live web simulator URL in the browser!
 
 ---
 
@@ -657,7 +657,7 @@ You must create the following directory structure inside the \`<project-name>\` 
 
 ---
 
-### Step 6: Git Commit, GitHub Push & GitHub Pages Static Deployment
+### Step 6: Git Commit, GitHub Push, Wait for Actions & Auto-Open Live Page
 - Stage all generated project files:
   \`\`\`bash
   git add .
@@ -681,11 +681,17 @@ You must create the following directory structure inside the \`<project-name>\` 
 - **Enable GitHub Pages Static Deployment**:
   Configure GitHub Pages to automatically serve the static web simulator (\`index.html\`) online from the \`main\` branch root (or via a \`.github/workflows/deploy-pages.yml\` workflow). The live URL will be:
   \`https://<github-username>.github.io/<project-name>/\`
+- **Wait for GitHub Actions Deployment & Automatically Open Page**:
+  Wait for the GitHub Actions deployment / Pages build workflow to finish executing (e.g., using \`gh run watch\` or checking \`curl -s -o /dev/null -w "%{http_code}" https://<github-username>.github.io/<project-name>/\`). Once completed and returning HTTP 200 OK, automatically launch and open the live website in the browser:
+  \`\`\`bash
+  open "https://<github-username>.github.io/<project-name>/"
+  \`\`\`
+  *(Or if Wave browser is available: \`open -a Wave "https://<github-username>.github.io/<project-name>/"\`)*
 
 ---
 
 ## 🚀 Final Deliverable Instructions
-Execute the steps above sequentially and thoroughly. When finished, print the CLI verification output, confirm the successful git push to GitHub (\`https://github.com/<github-username>/<project-name>\`), confirm GitHub Pages static deployment is enabled (\`https://<github-username>.github.io/<project-name>/\`), and provide clickable local and live links to the generated \`README.md\` and \`index.html\` files.`;
+Execute the steps above sequentially and thoroughly. When finished, print the CLI verification output, confirm the successful git push to GitHub (\`https://github.com/<github-username>/<project-name>\`), confirm that the GitHub Actions static deployment has completed, confirm that you have automatically opened the live GitHub Pages URL in the browser (\`https://<github-username>.github.io/<project-name>/\`), and provide clickable local and live links to the generated \`README.md\` and \`index.html\` files.`;
 
       document.getElementById('promptOutput').innerText = promptText;
 
