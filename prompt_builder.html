@@ -796,7 +796,11 @@ Execute the steps above sequentially and thoroughly. When finished, print the CL
       document.getElementById('examQuestion').value = '';
       document.getElementById('examAnswer').value = '';
       document.getElementById('repoVisibility').value = 'public';
-      updatePrompt();
+      
+      document.getElementById('promptOutput').innerText = '// Prompt deleted.\n// Enter your exam question and recommended architectural solution above, then click "Generate Prompt" to create your project prompt.';
+      document.getElementById('wordCount').innerText = '0';
+      document.getElementById('charCount').innerText = '0';
+      document.getElementById('tokenCount').innerText = '0';
 
       const clearBtn = document.getElementById('clearBtn');
       const clearText = document.getElementById('clearText');
