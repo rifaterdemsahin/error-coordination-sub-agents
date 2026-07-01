@@ -503,9 +503,9 @@
   </footer>
 </div>
 
-<!-- Lightbox for the infographic -->
+<!-- Universal Modal Lightbox Popup for All Images -->
 <div class="lightbox" id="lightbox" aria-hidden="true">
-  <img src="infographic.png" alt="Infographic (full size)" />
+  <img src="infographic.png" id="lightbox-img" alt="Zoomed diagram" />
 </div>
 
 <script>
@@ -681,14 +681,21 @@ function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 // initial paint
 renderDocs([]);
 
-// ── Lightbox for infographic ───────────────────────────────────────────────────
+// ── Universal Modal Popup Lightbox for All Images ──────────────────────────────
 (function () {
-  const img = document.getElementById("infographic");
   const box = document.getElementById("lightbox");
-  if (!img || !box) return;
-  const open = () => box.classList.add("open");
+  if (!box) return;
+  const boxImg = document.getElementById("lightbox-img") || box.querySelector("img");
+  const open = (src, alt) => {
+    if (boxImg) { boxImg.src = src; boxImg.alt = alt || ""; }
+    box.classList.add("open");
+  };
   const close = () => box.classList.remove("open");
-  img.addEventListener("click", open);
+
+  document.querySelectorAll("figure img, .svgfig img, .figure img, section img").forEach((img) => {
+    img.style.cursor = "zoom-in";
+    img.addEventListener("click", () => open(img.src, img.alt));
+  });
   box.addEventListener("click", close);
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
 })();
