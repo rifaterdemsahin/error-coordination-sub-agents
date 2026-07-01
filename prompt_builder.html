@@ -333,6 +333,68 @@
       height: 18px;
     }
 
+    .btn-generate {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      background: linear-gradient(135deg, var(--primary) 0%, #00a8ff 100%);
+      color: #000;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 0.85rem 1.25rem;
+      border-radius: 0.75rem;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .btn-generate:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.6);
+      background: linear-gradient(135deg, #33f3ff 0%, #1ab5ff 100%);
+    }
+
+    .btn-generate.generated {
+      background: linear-gradient(135deg, var(--accent) 0%, #059669 100%);
+      color: #fff;
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.5);
+    }
+
+    .btn-copy-form {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 0.85rem 1.25rem;
+      border-radius: 0.75rem;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .btn-copy-form:hover {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--primary);
+      color: var(--primary);
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+    }
+
+    .btn-copy-form.copied {
+      background: linear-gradient(135deg, var(--accent) 0%, #059669 100%);
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.5);
+    }
+
     .stats-bar {
       display: flex;
       gap: 1.5rem;
@@ -413,6 +475,17 @@
               <option value="private">Private Repository (--private)</option>
             </select>
             <div class="help-text">Visibility flag when pushing to GitHub via `gh repo create`</div>
+          </div>
+
+          <div class="action-buttons" style="display: flex; gap: 1rem; margin-top: 1.75rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+            <button type="button" id="generateBtn" class="btn-generate" onclick="generatePromptAction()" style="flex: 1.2;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              <span>Generate Prompt</span>
+            </button>
+            <button type="button" id="copyFormBtn" class="btn-copy-form" onclick="copyToClipboard()" style="flex: 1;">
+              <svg id="copyFormIcon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span id="copyFormText">Copy Prompt</span>
+            </button>
           </div>
         </form>
       </div>
@@ -616,17 +689,63 @@ Execute the steps above sequentially and thoroughly. When finished, print the CL
         const btn = document.getElementById('copyBtn');
         const textSpan = document.getElementById('copyText');
         const icon = document.getElementById('copyIcon');
+
+        const formBtn = document.getElementById('copyFormBtn');
+        const formTextSpan = document.getElementById('copyFormText');
+        const formIcon = document.getElementById('copyFormIcon');
         
-        btn.classList.add('copied');
-        textSpan.innerText = '✓ Copied to Clipboard!';
-        icon.innerHTML = '<polyline points="20 6 9 17 4 12"></polyline>';
+        if (btn) {
+          btn.classList.add('copied');
+          textSpan.innerText = '✓ Copied!';
+          icon.innerHTML = '<polyline points="20 6 9 17 4 12"></polyline>';
+        }
+
+        if (formBtn) {
+          formBtn.classList.add('copied');
+          formTextSpan.innerText = '✓ Copied!';
+          formIcon.innerHTML = '<polyline points="20 6 9 17 4 12"></polyline>';
+        }
         
         setTimeout(() => {
-          btn.classList.remove('copied');
-          textSpan.innerText = 'Copy Prompt';
-          icon.innerHTML = '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>';
+          if (btn) {
+            btn.classList.remove('copied');
+            textSpan.innerText = 'Copy Prompt';
+            icon.innerHTML = '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>';
+          }
+          if (formBtn) {
+            formBtn.classList.remove('copied');
+            formTextSpan.innerText = 'Copy Prompt';
+            formIcon.innerHTML = '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>';
+          }
         }, 2500);
       });
+    }
+
+    function generatePromptAction() {
+      updatePrompt();
+      const genBtn = document.getElementById('generateBtn');
+      const outputEl = document.getElementById('promptOutput');
+      
+      if (genBtn) {
+        genBtn.classList.add('generated');
+        genBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg><span>✓ Generated!</span>';
+      }
+      
+      if (outputEl) {
+        outputEl.style.borderColor = 'var(--primary)';
+        outputEl.style.boxShadow = '0 0 30px rgba(0, 240, 255, 0.4)';
+      }
+      
+      setTimeout(() => {
+        if (genBtn) {
+          genBtn.classList.remove('generated');
+          genBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg><span>Generate Prompt</span>';
+        }
+        if (outputEl) {
+          outputEl.style.borderColor = 'var(--border-color)';
+          outputEl.style.boxShadow = 'inset 0 2px 10px rgba(0, 0, 0, 0.5)';
+        }
+      }, 2000);
     }
 
     // Initialize on load
