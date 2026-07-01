@@ -41,21 +41,25 @@ Expected contrast over the same 4-document corpus:
 The resilient subagent recovers the corrupted-section and timeout cases **locally** and only
 escalates the password-protected document — with an attempt log and any partials.
 
-## Open the interactive page
+## Open the interactive pages
 
 ```bash
-open index.html
+open index.html          # interactive visual explanation + simulator
+open prompt_builder.html # Claude AI Architect interactive prompt generator
 ```
 
-A self-contained in-browser simulator runs the same task two ways and animates the
+A self-contained in-browser simulator (`index.html`) runs the same task two ways and animates the
 coordinator-intervention counter (the metric for "how much routine work the coordinator is
-being forced to handle").
+being forced to handle"). Additionally, `prompt_builder.html` provides a dynamic UI to generate
+master AI prompts for creating new Claude AI Architect exam projects from scratch.
 
 ## Project layout
 
 ```
 demo.js                       # CLI demo — naive vs resilient, side by side
 index.html                    # interactive visual explanation + simulator
+prompt_builder.html           # interactive prompt builder for new exam demos
+init_prompt.md                # master AI initialization prompt template
 docs/
   uml-class.svg               # class diagram (static structure & relationships)
   uml-workflow.svg            # sequence diagram (runtime workflow)
